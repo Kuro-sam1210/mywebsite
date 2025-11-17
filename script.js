@@ -8,22 +8,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// Dark mode toggle
-const themeToggle = document.getElementById('theme-toggle');
-const body = document.body;
-
-themeToggle.addEventListener('click', () => {
-  body.classList.toggle('dark');
-  themeToggle.textContent = body.classList.contains('dark') ? '☀️' : '🌙';
-  localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-});
-
-// Load saved theme
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') {
-  body.classList.add('dark');
-  themeToggle.textContent = '☀️';
-}
 
 
 // Intersection Observer for animations
@@ -49,6 +33,24 @@ document.querySelectorAll('.animate-fade-in, .animate-slide-up').forEach(el => {
   observer.observe(el);
 });
 
+// Animate progress bars on scroll
+const progressObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const progress = entry.target.querySelector('.progress');
+      const width = progress.style.width;
+      progress.style.width = '0%';
+      setTimeout(() => {
+        progress.style.width = width;
+      }, 100);
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.skill').forEach(skill => {
+  progressObserver.observe(skill);
+});
+
 // Contact form submission
 const contactForm = document.getElementById('contact-form');
 contactForm.addEventListener('submit', (e) => {
@@ -58,21 +60,58 @@ contactForm.addEventListener('submit', (e) => {
   contactForm.reset();
 });
 
-// Typing effect for hero subtitle
+// Cycling titles for hero subtitle
 const heroSubtitle = document.querySelector('.hero-subtitle');
-const text = heroSubtitle.textContent;
-heroSubtitle.textContent = '';
-let i = 0;
+const titles = [
+  'Frontend Developer',
+  'Backend Developer',
+  'Full-Stack Developer',
+  'Tech Innovator'
+];
+let titleIndex = 0;
 
-function typeWriter() {
-  if (i < text.length) {
-    heroSubtitle.textContent += text.charAt(i);
-    i++;
-    setTimeout(typeWriter, 50);
-  }
+function cycleTitles() {
+  heroSubtitle.textContent = titles[titleIndex];
+  titleIndex = (titleIndex + 1) % titles.length;
 }
 
-// Start typing effect after page load
+// Start cycling after page load
 window.addEventListener('load', () => {
-  setTimeout(typeWriter, 1000);
+  setTimeout(() => {
+    cycleTitles();
+    setInterval(cycleTitles, 3000); // Change every 3 seconds
+  }, 1000);
+});
+
+// Parallax effect for hero background
+window.addEventListener('scroll', () => {
+  const scrolled = window.pageYOffset;
+  const rate = scrolled * -0.5;
+  document.querySelector('.hero-bg').style.transform = `translateY(${rate}px)`;
+});
+
+// Skills slider functionality
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.dot');
+
+function showSlide(index) {
+  slides.forEach(slide => slide.classList.remove('active'));
+  dots.forEach(dot => dot.classList.remove('active'));
+  slides[index].classList.add('active');
+  dots[index].classList.add('active');
+  currentSlide = index;
+}
+
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % slides.length;
+  showSlide(currentSlide);
+}
+
+// Auto slide every 4 seconds
+setInterval(nextSlide, 4000);
+
+// Dot click handlers
+dots.forEach((dot, index) => {
+  dot.addEventListener('click', () => showSlide(index));
 });
