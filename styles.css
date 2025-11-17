@@ -374,9 +374,9 @@ body.dark .filter-btn {
   color: white;
 }
 
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+.projects-list {
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
@@ -406,20 +406,29 @@ body.dark .project-card {
   pointer-events: none;
 }
 
-.project-links {
-  margin-top: 1rem;
-  display: flex;
-  gap: 1rem;
+.project-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
-.project-links a {
+.project-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.live-demo {
+  display: inline-block;
+  margin-top: 1rem;
   color: #667eea;
-  text-decoration: none;
   font-weight: bold;
   transition: color 0.3s;
 }
 
-.project-links a:hover {
+.project-link:hover .live-demo {
   color: #764ba2;
 }
 
@@ -553,8 +562,8 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .projects-grid {
-    grid-template-columns: 1fr;
+  .projects-list {
+    /* No change needed for list */
   }
 
   .contact-content {
