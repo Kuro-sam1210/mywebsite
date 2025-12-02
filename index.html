@@ -1,235 +1,285 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Samuel's Business Portfolio</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samuel - Full-Stack Developer & Tech Innovator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for smoother transitions and hover effects */
+        .transition-colors-all { transition: all 0.3s ease-in-out; }
+        :root { --color-primary: #20b2aa; }
+        .text-primary { color: var(--color-primary); }
+        .bg-primary { background-color: var(--color-primary); }
+        .hover\:text-primary:hover { color: var(--color-primary); }
+        .border-primary { border-color: var(--color-primary); }
+        .shadow-primary { box-shadow: 0 10px 15px -3px rgba(32, 178, 170, 0.5), 0 4px 6px -2px rgba(32, 178, 170, 0.05); }
+
+        /* Initial state for Intersection Observer animations */
+        .animate-fade-in, .animate-slide-up { opacity: 0; transition: all 0.8s ease-out; }
+        .animate-slide-up { transform: translateY(30px); }
+
+        /* Final state when Intersection Observer triggers */
+        .animate-fade-in.is-visible, .animate-slide-up.is-visible { opacity: 1; transform: translateY(0); }
+
+        /* Custom style for sticky header when scrolled */
+        .header.scrolled {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+            border-bottom-color: #1f2937;
+        }
+
+        /* Hero Subtitle Transitions */
+        .hero-subtitle { transition: opacity 0.3s ease-in-out; }
+    </style>
 </head>
-<body class="dark">
-  <header>
-    <nav>
-      <div class="nav-container">
-        <h1 class="logo">Samuel</h1>
-        <ul>
-          <li><a href="#about">About</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#skills">Skills</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#contact">Contact</a></li>
+<body class="bg-gray-900 text-gray-200 font-sans tracking-tight">
+
+    <header class="header sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800 transition-all duration-300">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold text-primary transition-colors-all hover:scale-105">Samuel</h1>
+
+            <ul id="desktop-menu" class="hidden md:flex space-x-8 text-lg font-medium">
+                <li><a href="#about" class="hover:text-primary transition-colors-all">About</a></li>
+                <li><a href="#skills" class="hover:text-primary transition-colors-all">Skills</a></li>
+                <li><a href="#services" class="hover:text-primary transition-colors-all">Services</a></li>
+                <li><a href="#projects" class="hover:text-primary transition-colors-all">Projects</a></li>
+                <li><a href="#contact" class="hover:text-primary transition-colors-all">Contact</a></li>
+            </ul>
+
+            <a href="#contact" class="hidden md:block px-5 py-2 bg-primary text-gray-900 font-bold rounded-full hover:bg-cyan-300 transition-colors-all">Let's Talk</a>
+
+            <button id="menu-toggle" class="md:hidden text-2xl hover:text-primary focus:outline-none">
+                <svg id="icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <svg id="icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </nav>
+
+        <ul id="mobile-menu" class="md:hidden hidden absolute top-full left-0 w-full bg-gray-900/95 backdrop-blur-md shadow-xl border-t border-gray-800 text-center py-4 space-y-4 text-xl font-medium">
+            <li><a href="#about" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">About</a></li>
+            <li><a href="#skills" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Skills</a></li>
+            <li><a href="#services" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Services</a></li>
+            <li><a href="#projects" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Projects</a></li>
+            <li><a href="#contact" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Contact</a></li>
+            <li><a href="#contact" class="block py-2 px-5 bg-primary text-gray-900 font-bold rounded-full mx-auto w-3/4 mt-4 hover:bg-cyan-300 transition-colors-all">Hire Samuel</a></li>
         </ul>
-      </div>
-    </nav>
-  </header>
+    </header>
 
-  <section id="hero" class="hero-section">
-    <div class="hero-content animate-fade-in">
-      <h2 class="hero-title">Hi, I'm Samuel</h2>
-      <p class="hero-subtitle">Full-Stack Developer & Tech Innovator</p>
-      <p class="hero-description">Creating advanced web applications, mobile apps, automation tools, and browser extensions to bring your ideas to life.</p>
-      <a href="#projects" class="cta-btn animate-bounce">View My Work</a>
-    </div>
-    <div class="hero-bg">
-      <div class="particle particle-1"></div>
-      <div class="particle particle-2"></div>
-      <div class="particle particle-3"></div>
-    </div>
-  </section>
+    <main>
+        <section id="hero" class="relative overflow-hidden pt-24 pb-32 bg-gray-900 min-h-[80vh]">
+            <div id="hero-bg" class="hero-bg absolute inset-0 opacity-10 pointer-events-none transition-all duration-100 ease-linear">
+                <div class="h-full w-full bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            </div>
 
-  <section id="about" class="about-section">
-    <div class="container">
-      <h2 class="section-title animate-slide-up">About Me</h2>
-      <div class="about-content">
-        <div class="about-text">
-          <p>I'm a passionate developer with expertise in web technologies, mobile applications, and automation solutions. I specialize in creating efficient, user-friendly applications that solve real-world problems.</p>
-          <p>With a focus on modern development practices, I deliver high-quality code and innovative solutions tailored to your needs.</p>
-        </div>
-        <div class="about-stats">
-          <div class="stat">
-            <h3>10+</h3>
-            <p>Projects Completed</p>
-          </div>
-          <div class="stat">
-            <h3>3+</h3>
-            <p>Years Experience</p>
-          </div>
-          <div class="stat">
-            <h3>100%</h3>
-            <p>Client Satisfaction</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-12 z-10 relative">
+                <div class="md:w-3/5 lg:w-1/2 text-center md:text-left animate-fade-in">
+                    <p class="text-lg uppercase tracking-widest font-semibold text-gray-400 mb-2">Hello, I'm</p>
+                    <h2 class="text-6xl sm:text-7xl font-extrabold leading-tight text-white mb-4">
+                        <span class="text-primary block">Samuel</span>
+                        <span class="block">The Tech Innovator</span>
+                    </h2>
+                    <p id="hero-subtitle" class="hero-subtitle text-2xl text-gray-300 mb-6 font-light">Full-Stack Developer</p>
+                    
+                    <p class="text-gray-400 max-w-lg mx-auto md:mx-0 mb-10 animate-fade-in">
+                        I specialize in architecting efficient, scalable web applications, mobile apps, and custom automation tools to transform complex ideas into robust, deployed solutions.
+                    </p>
+                    <a href="#projects" class="inline-block px-10 py-4 bg-primary text-gray-900 font-extrabold rounded-lg shadow-xl shadow-primary/30 hover:bg-cyan-300 transition-colors-all text-xl animate-fade-in">
+                        View My Work →
+                    </a>
+                </div>
+                <div class="md:w-2/5 lg:w-1/2 mt-12 md:mt-0 animate-fade-in">
+                    <img src="[Image of a professional software developer working on multiple screens with code overlays].jpg" alt="Professional software developer working on multiple screens with code overlays" class="w-full h-auto rounded-lg shadow-lg">
+                </div>
+            </div>
+        </section>
 
-  <section id="skills" class="skills-banner">
-    <div class="container">
-      <h2 class="section-title animate-slide-up">Skills & Qualifications</h2>
-      <div class="slider-container">
-        <div class="slider">
-          <div class="slide active">
-            <h3>Frontend Development</h3>
-            <p>HTML5 • CSS3 • JavaScript • TypeScript • React • Next.js • Tailwind CSS • Responsive Design</p>
-          </div>
-          <div class="slide">
-            <h3>Backend Development</h3>
-            <p>Node.js • Express.js • Python • MongoDB • REST APIs • GraphQL • Authentication</p>
-          </div>
-          <div class="slide">
-            <h3>Tools & Technologies</h3>
-            <p>Git • GitHub • Docker • AWS • Web3 • Vercel • Figma • Agile • Scrum • Project Management</p>
-          </div>
-          <div class="slide">
-            <h3>Mobile & More</h3>
-            <p>Android Development • Kotlin • Flutter • Dart • Browser Extensions • Automation Scripts</p>
-          </div>
-          <div class="slide">
-            <h3>Qualifications</h3>
-            <p>3+ Years Experience • 10+ Projects Completed • 100% Client Satisfaction • Problem Solving Expert</p>
-          </div>
-        </div>
-        <div class="slider-dots">
-          <span class="dot active" data-slide="0"></span>
-          <span class="dot" data-slide="1"></span>
-          <span class="dot" data-slide="2"></span>
-          <span class="dot" data-slide="3"></span>
-          <span class="dot" data-slide="4"></span>
-        </div>
-      </div>
-    </div>
-  </section>
+        <section id="about" class="py-20 lg:py-32 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
+                    <span class="text-primary">|</span> About Me
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="text-lg space-y-6 text-gray-300 animate-fade-in">
+                        <p>I'm a passionate developer with a **1 year track record** in building complete digital solutions. My expertise spans from pixel-perfect frontends with **React/Next.js** to high-performance, secure backends using **Node.js, Express, and MongoDB.**</p>
+                        <p>My core philosophy is delivering **high-quality, innovative solutions** that are user-centric and easily scalable. I pride myself on clean code, modern development practices (Agile/Scrum), and a relentless focus on problem-solving.</p>
+                        <a href="#contact" class="inline-block mt-4 text-primary hover:text-cyan-300 font-semibold underline underline-offset-4">Ready to collaborate on your next big idea?</a>
+                    </div>
+                    <div class="grid grid-cols-3 gap-6 text-center animate-fade-in">
+                        <div class="p-6 bg-gray-800 rounded-xl shadow-2xl transition-all border border-gray-700">
+                            <h3 class="text-4xl font-extrabold text-primary">1</h3>
+                            <p class="text-gray-400 mt-2">Year Experience</p>
+                        </div>
+                        <div class="p-6 bg-gray-800 rounded-xl shadow-2xl transition-all border border-gray-700">
+                            <h3 class="text-4xl font-extrabold text-primary">10+</h3>
+                            <p class="text-gray-400 mt-2">Projects Completed</p>
+                        </div>
+                        <div class="p-6 bg-gray-800 rounded-xl shadow-2xl transition-all border border-gray-700">
+                            <h3 class="text-4xl font-extrabold text-primary">100%</h3>
+                            <p class="text-gray-400 mt-2">Client Satisfaction</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <section id="services" class="services-section">
-    <div class="container">
-      <h2 class="section-title animate-slide-up">My Services</h2>
-      <div class="services-grid">
-        <div class="service-card animate-fade-in">
-          <div class="service-icon">🌐</div>
-          <h3>Web Development</h3>
-          <p>Custom websites and web applications using HTML, CSS, JavaScript, and modern frameworks. Responsive, fast, and SEO-optimized.</p>
-        </div>
-        <div class="service-card animate-fade-in">
-          <div class="service-icon">📱</div>
-          <h3>Mobile App Development</h3>
-          <p>Native Android applications with intuitive UI/UX, integrating various APIs and features for seamless user experience.</p>
-        </div>
-        <div class="service-card animate-fade-in">
-          <div class="service-icon">🤖</div>
-          <h3>Automation Scripts</h3>
-          <p>Python-based automation solutions for repetitive tasks, data processing, and system integrations.</p>
-        </div>
-        <div class="service-card animate-fade-in">
-          <div class="service-icon">🔧</div>
-          <h3>Browser Extensions</h3>
-          <p>Chrome extensions that enhance productivity, provide useful tools, and customize browsing experience.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+        <section id="skills" class="py-20 lg:py-32 bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
+                    <span class="text-primary">|</span> My Tech Stack
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
+                        <div class="text-3xl mb-3">💻</div>
+                        <h3 class="text-2xl font-semibold mb-3 text-white">Frontend</h3>
+                        <p class="text-gray-400">HTML5, CSS3, **JavaScript, TypeScript**</p>
+                        <p class="text-gray-400 font-medium">**React, Next.js, Tailwind CSS**</p>
+                    </div>
+                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
+                        <div class="text-3xl mb-3">⚙️</div>
+                        <h3 class="text-2xl font-semibold mb-3 text-white">Backend & DB</h3>
+                        <p class="text-gray-400">**Node.js, Express.js, Python**</p>
+                        <p class="text-gray-400 font-medium">**MongoDB**, REST & GraphQL APIs</p>
+                    </div>
+                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
+                        <div class="text-3xl mb-3">🛠️</div>
+                        <h3 class="text-2xl font-semibold mb-3 text-white">DevOps & Tools</h3>
+                        <p class="text-gray-400">**Git, GitHub, Docker**</p>
+                        <p class="text-gray-400 font-medium">AWS, Vercel, CI/CD</p>
+                    </div>
+                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
+                        <div class="text-3xl mb-3">📱</div>
+                        <h3 class="text-2xl font-semibold mb-3 text-white">Mobile & Scripts</h3>
+                        <p class="text-gray-400">Android Dev, **Kotlin**</p>
+                        <p class="text-gray-400 font-medium">**Flutter, Dart**</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <section id="projects" class="projects-section">
-    <div class="container">
-      <h2 class="section-title animate-slide-up">Sample Projects</h2>
-      <div class="projects-list">
-        <a href="https://adminpaneldash.netlify.app" target="_blank" class="project-link">
-          <div class="project-card animate-fade-in" data-category="web">
-            <img src="admin panel dashboard.png" alt="Admin Panel Dashboard" class="project-image">
-            <h3>Admin Panel Dashboard</h3>
-            <p>A comprehensive admin dashboard with user management, analytics, and reporting features.</p>
-            <span class="live-demo">Live Demo →</span>
-          </div>
-        </a>
-        <a href="https://wagerwager.netlify.app" target="_blank" class="project-link">
-          <div class="project-card animate-fade-in" data-category="web">
-            <img src="wagerwager.png" alt="Wagerwager" class="project-image">
-            <h3>Wagerwager</h3>
-            <p>An interactive wagering platform with modern UI and real-time features.</p>
-            <span class="live-demo">Live Demo →</span>
-          </div>
-        </a>
-        <a href="https://studentdashsam.netlify.app" target="_blank" class="project-link">
-          <div class="project-card animate-fade-in" data-category="web">
-            <img src="student dashboard.png" alt="Student Dashboard" class="project-image">
-            <h3>Student Dashboard</h3>
-            <p>A student management system with course tracking, grades, and progress monitoring.</p>
-            <span class="live-demo">Live Demo →</span>
-          </div>
-        </a>
-        <a href="https://landingpagesam1210.netlify.app" target="_blank" class="project-link">
-          <div class="project-card animate-fade-in" data-category="web">
-            <img src="landing page.png" alt="Landing Page" class="project-image">
-            <h3>Landing Page</h3>
-            <p>A modern, responsive landing page template with call-to-action sections and smooth animations.</p>
-            <span class="live-demo">Live Demo →</span>
-          </div>
-        </a>
-        <a href="https://tictacoo.netlify.app" target="_blank" class="project-link">
-          <div class="project-card animate-fade-in" data-category="web">
-            <img src="tic tac toe.png" alt="Tic Tac Toe Game" class="project-image">
-            <h3>Tic Tac Toe Game</h3>
-            <p>A classic game with AI opponent and score tracking.</p>
-            <span class="live-demo">Live Demo →</span>
-          </div>
-        </a>
-        <a href="https://photolightbox.netlify.app" target="_blank" class="project-link">
-          <div class="project-card animate-fade-in" data-category="web">
-            <img src="photo.png" alt="Photo Gallery Lightbox" class="project-image">
-            <h3>Photo Gallery Lightbox</h3>
-            <p>An elegant image gallery with lightbox functionality and smooth transitions.</p>
-            <span class="live-demo">Live Demo →</span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
+        <section id="services" class="py-20 lg:py-32 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
+                    <span class="text-primary">|</span> Services Offered
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
+                        <div class="text-5xl mb-4 text-primary">🌐</div>
+                        <h3 class="text-2xl font-bold mb-3 text-white">Full-Stack Web Apps</h3>
+                        <p class="text-gray-400">Building scalable, high-performance web applications from concept to deployment using modern MERN stack or Next.js.</p>
+                    </div>
+                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
+                        <div class="text-5xl mb-4 text-primary">📱</div>
+                        <h3 class="text-2xl font-bold mb-3 text-white">Cross-Platform Mobile</h3>
+                        <p class="text-gray-400">Developing native-quality mobile applications for Android/iOS using **Flutter** and Native Android (Kotlin).</p>
+                    </div>
+                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
+                        <div class="text-5xl mb-4 text-primary">🤖</div>
+                        <h3 class="text-2xl font-bold mb-3 text-white">Automation & Tools</h3>
+                        <p class="text-gray-400">Creating custom Python and Node.js scripts for data scraping, workflow automation, and repetitive task elimination.</p>
+                    </div>
+                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
+                        <div class="text-5xl mb-4 text-primary">🔧</div>
+                        <h3 class="text-2xl font-bold mb-3 text-white">Custom Extensions</h3>
+                        <p class="text-gray-400">Designing and building powerful, secure browser extensions to enhance user productivity and workflow integration.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <section id="contact" class="contact-section">
-    <div class="container">
-      <h2 class="section-title animate-slide-up">Get In Touch</h2>
-      <div class="contact-content">
-        <div class="contact-info">
-          <h3>Contact Information</h3>
-          <div class="contact-item">
-            <span class="contact-icon">📧</span>
-            <span>samuelmajasan6@gmail.com</span>
-          </div>
-          <div class="contact-item">
-            <span class="contact-icon">📱</span>
-            <span>+234 706 956 8320 (WhatsApp)</span>
-          </div>
-          <div class="contact-item">
-            <span class="contact-icon">💬</span>
-            <span>@Samuel121004 (Telegram)</span>
-          </div>
-          <div class="contact-item">
-            <span class="contact-icon">💼</span>
-            <span>Available for projects</span>
-          </div>
+        <section id="projects" class="py-20 lg:py-32 bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
+                    <span class="text-primary">|</span> Featured Projects
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <a href="https://adminpaneldash.netlify.app" target="_blank" class="block group animate-fade-in">
+                        <div class="bg-gray-900 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
+                            <img src="admin panel dashboard.png" alt="Admin Panel Dashboard" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2 text-primary">Admin Panel Dashboard</h3>
+                                <p class="text-gray-400 text-sm">A comprehensive admin dashboard with user management, analytics, and reporting features.</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="https://wagerwager.netlify.app" target="_blank" class="block group animate-fade-in">
+                        <div class="bg-gray-900 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
+                            <img src="wagerwager.png" alt="Wagerwager" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2 text-primary">Wagerwager</h3>
+                                <p class="text-gray-400 text-sm">An interactive wagering platform with modern UI and real-time features.</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="https://studentdashsam.netlify.app" target="_blank" class="block group animate-fade-in">
+                        <div class="bg-gray-900 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
+                            <img src="student dashboard.png" alt="Student Dashboard" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2 text-primary">Student Dashboard</h3>
+                                <p class="text-gray-400 text-sm">A student management system with course tracking, grades, and progress monitoring.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="text-center mt-16 animate-fade-in">
+                    <a href="https://github.com/Kuro-sam1210" target="_blank" class="inline-block px-8 py-3 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary/20 transition-all">
+                        View All 10+ Projects on GitHub
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20 lg:py-32 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
+                    <span class="text-primary">|</span> Let's Create Together
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 bg-gray-800 p-8 md:p-12 rounded-xl shadow-2xl animate-fade-in">
+                    <div class="space-y-6">
+                        <h3 class="text-3xl font-bold text-white mb-6">Contact Information</h3>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl text-primary">📧</span>
+                            <span class="text-lg text-gray-300">samuelmajasan6@gmail.com</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl text-primary">📱</span>
+                            <span class="text-lg text-gray-300">+234 706 956 8320 (WhatsApp)</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl text-primary">💬</span>
+                            <span class="text-lg text-gray-300">@Samuel121004 (Telegram)</span>
+                        </div>
+                        <div class="pt-8">
+                            <h4 class="text-xl font-semibold text-white mb-3">Find Me Online</h4>
+                            <div class="flex space-x-6">
+                                <a href="https://github.com/Kuro-sam1210" target="_blank" class="text-2xl text-gray-400 hover:text-primary transition-colors-all">GitHub</a>
+                                <a href="https://www.linkedin.com/in/samuel-majasan-1714662aa/" target="_blank" class="text-2xl text-gray-400 hover:text-primary transition-colors-all">LinkedIn</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="contact-form" class="space-y-6">
+                        <input type="text" name="name" placeholder="Your Name" required class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white">
+                        <input type="email" name="email" placeholder="Your Email" required class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white">
+                        <textarea name="message" placeholder="Your Message" required rows="5" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white"></textarea>
+                        <button type="submit" class="w-full py-4 bg-primary text-gray-900 font-extrabold rounded-lg hover:bg-cyan-300 transition-colors-all text-lg shadow-lg shadow-primary/30">
+                            Send Secure Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-400">
+            <p>&copy; 2024 Samuel. Full-Stack Development & Innovation.</p>
+            <div class="mt-4 space-x-4 text-sm">
+                <a href="#about" class="hover:text-primary transition-colors-all">About</a>
+                <a href="#services" class="hover:text-primary transition-colors-all">Services</a>
+                <a href="#contact" class="hover:text-primary transition-colors-all">Contact</a>
+            </div>
         </div>
-        <form id="contact-form" class="animate-fade-in">
-          <input type="text" name="name" placeholder="Your Name" required>
-          <input type="email" name="email" placeholder="Your Email" required>
-          <textarea name="message" placeholder="Your Message" required></textarea>
-          <button type="submit">Send Message</button>
-        </form>
-      </div>
-    </div>
-  </section>
+    </footer>
 
-  <footer>
-    <div class="container">
-      <p>&copy; 2024 Samuel. All rights reserved.</p>
-      <div class="social-links">
-        <a href="https://github.com/Kuro-sam1210" target="_blank">GitHub</a>
-        <a href="https://www.linkedin.com/in/samuel-majasan-1714662aa/" target="_blank">LinkedIn</a>
-        <a href="mailto:samuelmajasan6@gmail.com">Email</a>
-        <a href="https://wa.me/2347069568320">WhatsApp</a>
-        <a href="https://t.me/Samuel121004">Telegram</a>
-      </div>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

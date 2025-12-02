@@ -1,117 +1,162 @@
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    document.querySelector(this.getAttribute('href')).scrollIntoView({
-      behavior: 'smooth'
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- 0. Mobile Menu Toggle Logic ---
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconOpen = document.getElementById('icon-open');
+    const iconClose = document.getElementById('icon-close');
+    const mobileLinks = mobileMenu ? mobileMenu.querySelectorAll('a') : [];
+
+    const toggleMobileMenu = () => {
+        if (!mobileMenu) return;
+
+        const isHidden = mobileMenu.classList.contains('hidden');
+
+        if (isHidden) {
+            mobileMenu.classList.remove('hidden');
+            iconOpen.classList.add('hidden');
+            iconClose.classList.remove('hidden');
+        } else {
+            mobileMenu.classList.add('hidden');
+            iconOpen.classList.remove('hidden');
+            iconClose.classList.add('hidden');
+        }
+    };
+
+    if (menuToggle) {
+        menuToggle.addEventListener('click', toggleMobileMenu);
+
+        // Close menu when a link is clicked (for seamless navigation)
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Delay slightly to allow smooth scroll to start
+                setTimeout(toggleMobileMenu, 200);
+            });
+        });
+    }
+
+    // --- 1. Intersection Observer for Animations (Performance Friendly) ---
+    // Targets elements with .animate-fade-in or .animate-slide-up classes
+    const observerOptions = {
+        // Triggers animation when 10% of the element is visible
+        threshold: 0.1, 
+        // Starts observing 50px before the element enters the viewport
+        rootMargin: '0px 0px -50px 0px' 
+    };
+
+    const sectionObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Add the 'is-visible' class which triggers the CSS transition/animation
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target); // Stop observing once visible to save resources
+            }
+        });
+    }, observerOptions);
+
+    // Initial setup for elements to be observed
+    document.querySelectorAll('.animate-fade-in, .animate-slide-up').forEach(el => {
+        sectionObserver.observe(el);
     });
-  });
-});
 
+    // --- 2. Sticky Header Logic (Adds 'scrolled' class for shadow/styling) ---
+    const header = document.querySelector('.header');
+    
+    // Function to handle the sticky logic
+    const toggleHeaderShadow = () => {
+        // Use scrollY instead of pageYOffset (modern preference)
+        if (window.scrollY > 50) { 
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    };
 
-
-// Intersection Observer for animations
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
+    if (header) {
+        window.addEventListener('scroll', toggleHeaderShadow);
+        // Run once on load to handle mid-page reload
+        toggleHeaderShadow();
     }
-  });
-}, observerOptions);
 
-// Observe elements with animation classes
-document.querySelectorAll('.animate-fade-in, .animate-slide-up').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(30px)';
-  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-  observer.observe(el);
-});
 
-// Animate progress bars on scroll
-const progressObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const progress = entry.target.querySelector('.progress');
-      const width = progress.style.width;
-      progress.style.width = '0%';
-      setTimeout(() => {
-        progress.style.width = width;
-      }, 100);
+    // --- 3. Hero Subtitle Cycling (Dynamic text content) ---
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    const titles = [
+        'Full-Stack Developer',
+        'Frontend Specialist', // Changed for variety
+        'Backend Architect',    // Changed for variety
+        'Mobile App Innovator',
+        'Automation Expert'     // Added another title
+    ];
+    let titleIndex = 0;
+
+    const cycleTitles = () => {
+        if (heroSubtitle) {
+            // Smoothly change the text content
+            heroSubtitle.style.opacity = 0; // Start fade out
+            setTimeout(() => {
+                heroSubtitle.textContent = titles[titleIndex];
+                titleIndex = (titleIndex + 1) % titles.length;
+                heroSubtitle.style.opacity = 1; // Fade in
+            }, 300); // Half the CSS transition time (assuming 0.6s)
+        }
+    };
+
+    if (heroSubtitle) {
+        // Start cycling after a short delay
+        setTimeout(() => {
+            cycleTitles();
+            // Cycle every 3 seconds (3000ms)
+            setInterval(cycleTitles, 3000); 
+        }, 500);
     }
-  });
-}, observerOptions);
 
-document.querySelectorAll('.skill').forEach(skill => {
-  progressObserver.observe(skill);
-});
 
-// Contact form submission
-const contactForm = document.getElementById('contact-form');
-contactForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  // In a real implementation, you'd send this to a backend service
-  alert('Thank you for your message! I\'ll get back to you soon.');
-  contactForm.reset();
-});
+    // --- 4. Parallax effect with requestAnimationFrame (Performance Optimization) ---
+    const heroBg = document.getElementById('hero-bg'); // Updated selector to ID
+    let ticking = false;
 
-// Cycling titles for hero subtitle
-const heroSubtitle = document.querySelector('.hero-subtitle');
-const titles = [
-  'Frontend Developer',
-  'Backend Developer',
-  'Full-Stack Developer',
-  'Tech Innovator'
-];
-let titleIndex = 0;
+    const updateParallax = () => {
+        if (heroBg) {
+            const scrolled = window.scrollY;
+            // Negative rate moves background slower than foreground for the illusion of depth
+            const rate = scrolled * -0.3; 
+            // Use translate3d for better GPU acceleration
+            heroBg.style.transform = `translate3d(0, ${rate}px, 0)`;
+        }
+        ticking = false;
+    };
 
-function cycleTitles() {
-  heroSubtitle.textContent = titles[titleIndex];
-  titleIndex = (titleIndex + 1) % titles.length;
-}
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }, { passive: true }); // Use passive listener for best scroll performance
 
-// Start cycling after page load
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    cycleTitles();
-    setInterval(cycleTitles, 3000); // Change every 3 seconds
-  }, 1000);
-});
 
-// Parallax effect for hero background
-window.addEventListener('scroll', () => {
-  const scrolled = window.pageYOffset;
-  const rate = scrolled * -0.5;
-  document.querySelector('.hero-bg').style.transform = `translateY(${rate}px)`;
-});
+    // --- 5. Contact form submission ---
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Disable button and show loading state (Good UX practice)
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
 
-// Skills slider functionality
-let currentSlide = 0;
-const slides = document.querySelectorAll('.slide');
-const dots = document.querySelectorAll('.dot');
+            // Simulate form submission success/failure
+            setTimeout(() => {
+                console.log('Form submitted:', new FormData(contactForm));
+                alert('Thank you for your message! I\'ll get back to you soon.');
+                contactForm.reset();
 
-function showSlide(index) {
-  slides.forEach(slide => slide.classList.remove('active'));
-  dots.forEach(dot => dot.classList.remove('active'));
-  slides[index].classList.add('active');
-  dots[index].classList.add('active');
-  currentSlide = index;
-}
+                // Reset button state
+                submitButton.textContent = 'Send Secure Message';
+                submitButton.disabled = false;
+            }, 1500); // Simulating network latency
+        });
+    }
 
-function nextSlide() {
-  currentSlide = (currentSlide + 1) % slides.length;
-  showSlide(currentSlide);
-}
-
-// Auto slide every 4 seconds
-setInterval(nextSlide, 4000);
-
-// Dot click handlers
-dots.forEach((dot, index) => {
-  dot.addEventListener('click', () => showSlide(index));
 });
