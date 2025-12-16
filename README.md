@@ -23,8 +23,8 @@ An advanced, flashy portfolio website showcasing services and sample projects.
 - Admin Panel Dashboard (adminpaneldash.netlify.app)
 - Student Dashboard (studentdashsam.netlify.app)
 - Landing Page (landingpagesam1210.netlify.app)
-- Currency Converter (currencyconc.netlify.app)
-- Tic Tac Toe Game (tictacoo.netlify.app)
+- Currency Converter (currencyconverter.netlify.app)
+- Tic Tac Toe Game (tictactoe.netlify.app)
 - Photo Gallery Lightbox (photolightbox.netlify.app)
 
 ## Launch Instructions

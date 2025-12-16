@@ -3,265 +3,657 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samuel - Full-Stack Developer & Tech Innovator</title>
+    <title>Samuel - CORE: Biomechanical System Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Custom styles for smoother transitions and hover effects */
-        .transition-colors-all { transition: all 0.3s ease-in-out; }
-        :root { --color-primary: #20b2aa; }
-        .text-primary { color: var(--color-primary); }
-        .bg-primary { background-color: var(--color-primary); }
-        .hover\:text-primary:hover { color: var(--color-primary); }
-        .border-primary { border-color: var(--color-primary); }
-        .shadow-primary { box-shadow: 0 10px 15px -3px rgba(32, 178, 170, 0.5), 0 4px 6px -2px rgba(32, 178, 170, 0.05); }
-
-        /* Initial state for Intersection Observer animations */
-        .animate-fade-in, .animate-slide-up { opacity: 0; transition: all 0.8s ease-out; }
-        .animate-slide-up { transform: translateY(30px); }
-
-        /* Final state when Intersection Observer triggers */
-        .animate-fade-in.is-visible, .animate-slide-up.is-visible { opacity: 1; transform: translateY(0); }
-
-        /* Custom style for sticky header when scrolled */
-        .header.scrolled {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
-            border-bottom-color: #1f2937;
+        /* ========================================================================= */
+        /* 1. THEMATIC STYLES: COLORS & FONTS */
+        /* ========================================================================= */
+        :root { 
+            --color-primary: #00ffff; /* Electric Cyan */
+            --color-secondary: #ff00ff; /* Pulsing Magenta */
+            --color-shadow: 0, 255, 255; 
+            --global-pulse: 1; /* JS controlled heartbeat */
+            --bg-color: #0d0d0d;
         }
 
-        /* Hero Subtitle Transitions */
-        .hero-subtitle { transition: opacity 0.3s ease-in-out; }
+        /* Set the main font for the digital/terminal feel */
+        .font-primary { font-family: 'Space Mono', monospace; }
+        .font-display { font-family: 'Orbitron', sans-serif; }
+
+        body { background-color: var(--bg-color); }
+        .text-primary { color: var(--color-primary); }
+        .bg-primary { background-color: var(--color-primary); }
+        .border-primary { border-color: var(--color-primary); }
+
+        /* ========================================================================= */
+        /* 2. CORE EFFECTS: GLOW, PULSE, & BACKGROUND */
+        /* ========================================================================= */
+        
+        /* Global Glow/Pulse Animation */
+        @keyframes neon-pulse {
+            0%, 100% { 
+                filter: drop-shadow(0 0 5px rgba(var(--color-shadow), 0.5));
+                box-shadow: 0 0 15px rgba(var(--color-shadow), 0.2); 
+            }
+            50% { 
+                filter: drop-shadow(0 0 10px rgba(var(--color-shadow), 0.8));
+                box-shadow: 0 0 30px rgba(var(--color-shadow), 0.4); 
+            }
+        }
+
+        /* Applied to key elements by JS */
+        .system-glow {
+            transition: all 4s ease-in-out; 
+            animation: neon-pulse 4s infinite alternate; 
+        }
+
+        /* Glitch Flicker (for typing/transition) */
+        @keyframes glitch-flicker {
+            0% { transform: translate(0); opacity: 0.9; }
+            50% { transform: translate(1px, -1px); color: var(--color-secondary); opacity: 0.5; }
+            100% { transform: translate(-1px, 1px); color: var(--color-primary); opacity: 1; }
+        }
+        .text-glitch { animation: glitch-flicker 0.2s steps(2, start) infinite; }
+
+        /* Background Circuit Grid (Subtle, complex background) */
+        .circuit-bg {
+            background-image: 
+                linear-gradient(to right, #1f2937 1px, transparent 1px),
+                linear-gradient(to bottom, #1f2937 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.1;
+            /* Add a subtle scanline effect for an analog feel */
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
+        }
+
+        /* ========================================================================= */
+        /* 3. COMPONENT STYLES */
+        /* ========================================================================= */
+
+        /* Navigation Links - Wireframe Effect */
+        .nav-link {
+            position: relative;
+            padding-bottom: 4px;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--color-primary);
+            transition: width 0.3s ease-out;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Data Card (Skills, Services) */
+        .data-card {
+            background-color: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            transition: all 0.3s ease;
+            /* ADD MIN-HEIGHT to prevent squashing */
+            min-height: 280px; /* Ensure sufficient vertical space for all content */
+            border-radius: 0.75rem; /* Match rounded-xl */
+            overflow: hidden; /* Ensure header elements stay within bounds */
+        }
+        .data-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+        }
+        .data-card-header {
+            background-color: #2a2a2a;
+            border-bottom: 1px solid #3d3d3d;
+            /* Use flex-col on smaller screens if necessary, or just rely on a slightly bigger gap */
+            flex-direction: row; /* Keep elements side-by-side */
+            flex-wrap: nowrap; /* Prevent wrapping in the header if possible */
+            align-items: flex-start; /* Align header elements neatly to the top */
+            padding: 1.25rem 1rem; /* Increase vertical padding slightly */
+        }
+
+        /* Ensure the header text itself doesn't crowd */
+        .data-card-header h3 {
+            line-height: 1.2;
+            margin-right: 1rem; /* Add space between title and status */
+            word-break: break-word; /* Allow long titles to wrap within their area */
+        }
+
+        /* Intersection Observer Animations */
+        .animate-fade-in, .animate-slide-up { opacity: 0; transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1); }
+        .animate-slide-up { transform: translateY(50px); }
+        .animate-fade-in.is-visible, .animate-slide-up.is-visible { opacity: 1; transform: translateY(0); }
+
+        /* Breathing Keyframes */
+        @keyframes title-breathe {
+            0%, 100% {
+                transform: scale(1);
+                text-shadow: 0 0 5px rgba(var(--color-shadow), 0.5);
+            }
+            50% {
+                transform: scale(1.01); /* Subtle 1% expansion */
+                text-shadow: 0 0 15px rgba(var(--color-shadow), 0.8),
+                             0 0 30px rgba(255, 0, 255, 0.4); /* Magenta secondary glow */
+            }
+        }
+
+        /* Apply breathing to the main name (Samuel) */
+        .text-breathing {
+            animation: title-breathe 8s ease-in-out infinite;
+        }
+
+        /* CSS for the Iris/Pupil to interact with the JS */
+        #iris {
+            transition: all 0.2s ease-out; /* Smooth movement when reacting to pupil */
+        }
+        #pupil {
+            transform-origin: 50% 50%; /* Necessary for movement calculations */
+            transition: transform 0.1s ease-out; /* Quick response to mouse */
+        }
+
+        /* NEW CSS FOR FIXED EYE AND CODE STREAM */
+        #code-stream-bg {
+            /* Now Fixed to the viewport */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Keep it below everything */
+            opacity: 0.03;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        #observer-eye-container {
+            /* New fixed container for the eye */
+            position: fixed;
+            z-index: 50; /* Above regular content but below header (z-50) */
+            opacity: 0.3; /* Start visible */
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none; /* Crucial: Allows clicking through to content */
+        }
+
+        #observer-eye-container:hover {
+            opacity: 1; /* Fade in on hover (if pointer-events wasn't set to none) */
+        }
+
+        /* Style for the new HTML Laser Beam DIV */
+        #laser-beam {
+            position: absolute;
+            /* Center the beam element on the eye: 48px is half of 96px (eye size - margin) */
+            top: 50%;
+            left: 50%;
+            height: 2px; /* Thickness of the beam */
+            width: 0;
+            transform-origin: 0 50%; /* Pivot point is the left edge (eye center) */
+            pointer-events: none;
+            transition: opacity 0.1s; /* Smooth opacity change */
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0; }
+        }
+
+        .blink {
+            animation: blink 0.1s;
+        }
+
+        .eye-scanned {
+            box-shadow: 0 0 20px var(--color-primary), 0 0 40px var(--color-secondary);
+            transition: box-shadow 0.5s ease;
+        }
+
+        /* KEYFRAMES for the Glitch Effect */
+        @keyframes text-glitch-scan {
+            0% {
+                transform: translate(0);
+                text-shadow: 0.5px 0 0 var(--color-secondary), -0.5px 0 0 var(--color-primary);
+            }
+            14% { transform: translate(-2px, 1px); }
+            15% { transform: translate(4px, -3px); }
+            16% { transform: translate(-4px, 1px); }
+            17% { transform: translate(2px, -2px); }
+            18% { transform: translate(-3px, 0); }
+            20% { transform: translate(1px, 2px); }
+            22% {
+                transform: translate(0);
+                text-shadow: 0 0 0 var(--color-secondary), 0 0 0 var(--color-primary);
+            }
+            100% { transform: translate(0); }
+        }
+
+        /* New state for elements that have been randomly corrupted */
+        .corrupted-color {
+            color: var(--color-secondary) !important; /* Forces the error color */
+            background-color: rgba(255, 0, 255, 0.05); /* Subtle background corruption */
+            border: 1px dashed var(--color-secondary); /* Dashed border error */
+        }
+
+        /* The scanning effect class (brief highlight, not permanent) */
+        .scanned {
+            /* Don't permanently force color; use a short highlight and subtle glow */
+            animation: text-glitch-scan 0.35s steps(1) 1 forwards;
+            text-shadow: 0 0 6px var(--color-primary);
+        }
+
+        /* Additional glitch visual classes */
+        .corrupted-pink {
+            color: #ff1fb1 !important;
+            background-color: rgba(255, 0, 170, 0.04);
+            border: 1px dashed rgba(255, 0, 170, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 1 }
+            50% { opacity: 0.2 }
+            100% { opacity: 1 }
+        }
+        .glitch-flicker {
+            animation: flicker 0.12s steps(1) infinite;
+        }
+
+        .glitch-blur {
+            filter: blur(3px) contrast(0.9);
+            transition: filter 0.3s ease;
+        }
+
+        .glitch-invert {
+            filter: invert(1) hue-rotate(180deg) saturate(1.2);
+            transition: filter 0.25s ease;
+        }
+
+        .glitch-shake {
+            animation: wiggle 0.8s linear;
+        }
+
+        /* Keep glitch effects subtle and temporary */
+        .glitch-outline {
+            box-shadow: 0 0 8px var(--color-secondary);
+            border: 1px dashed var(--color-secondary);
+        }
+
+        #laser-beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-primary), transparent);
+            box-shadow: 0 0 10px var(--color-primary);
+            transform-origin: 0 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            z-index: 49;
+        }
+
+
+        /* Styling for the Particles and Echoes created by the teleport function */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background-color: var(--color-secondary); /* Magenta for teleportation energy */
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-fade 2s ease-out forwards;
+            z-index: 9999;
+        }
+
+        .echo-eye {
+            position: fixed;
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: echo-ring 1s ease-out forwards;
+            z-index: 9999;
+            opacity: 0.8;
+        }
+
+        @keyframes particle-fade {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        @keyframes echo-ring {
+            0% { transform: scale(0.1); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* New: Cursor Flicker */
+        #cursor-disruptor {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: transparent;
+            border: 1px solid var(--color-secondary);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.1s ease-out, opacity 0.3s ease-out;
+            z-index: 9998; /* Just below the eye */
+            mix-blend-mode: screen; /* Fun glowing effect */
+            opacity: 0;
+        }
+
+        /* New: Data Probes/Raycasting container */
+        #probe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10; /* Below content, above circuit grid */
+        }
+        .data-probe {
+            position: absolute;
+            height: 2px;
+            width: 0;
+            background: linear-gradient(90deg, transparent 0%, var(--color-secondary) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.5s, width 1s ease-in-out;
+            transform-origin: left center;
+        }
+
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200 font-sans tracking-tight">
+<body class="bg-gray-900 text-gray-200 font-primary tracking-tight">
+
+    <audio id="system-tick-audio" loop preload="auto">
+        <source src="tick.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="cursor-disruptor"></div>
+
+    <div id="probe-container"></div>
+
+    <div id="code-stream-bg"></div>
+
+    <div id="observer-eye-container" class="hidden lg:block">
+        <div id="observer-eye" class="w-48 h-48 relative system-glow">
+            <div id="laser-beam"></div>
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+                <circle cx="50" cy="50" r="48" fill="#151515" stroke="var(--color-primary)" stroke-width="1.5" opacity="0.8"/>
+                <circle id="iris" cx="50" cy="50" r="25" fill="var(--color-primary)" opacity="0.2"/>
+                <circle id="pupil" cx="50" cy="50" r="10" fill="#000" stroke="var(--color-primary)" stroke-width="2"/>
+            </svg>
+            <p class="absolute right-0 bottom-5 text-sm font-display text-primary uppercase">[ Monitoring ]</p>
+        </div>
+    </div>
 
     <header class="header sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800 transition-all duration-300">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold text-primary transition-colors-all hover:scale-105">Samuel</h1>
+            <h1 class="text-3xl font-display font-bold text-primary transition-colors-all hover:scale-105">
+                <span class="text-secondary">[</span>SAMUEL-CORE<span class="text-secondary">]</span>
+            </h1>
 
             <ul id="desktop-menu" class="hidden md:flex space-x-8 text-lg font-medium">
-                <li><a href="#about" class="hover:text-primary transition-colors-all">About</a></li>
-                <li><a href="#skills" class="hover:text-primary transition-colors-all">Skills</a></li>
-                <li><a href="#services" class="hover:text-primary transition-colors-all">Services</a></li>
-                <li><a href="#projects" class="hover:text-primary transition-colors-all">Projects</a></li>
-                <li><a href="#contact" class="hover:text-primary transition-colors-all">Contact</a></li>
+                <li><a href="#about" class="nav-link hover:text-primary transition-colors-all">01: /About</a></li>
+                <li><a href="#skills" class="nav-link hover:text-primary transition-colors-all">02: /Diagnostics</a></li>
+                <li><a href="#services" class="nav-link hover:text-primary transition-colors-all">03: /Capabilities</a></li>
+                <li><a href="#projects" class="nav-link hover:text-primary transition-colors-all">04: /DataLogs</a></li>
+                <li><a href="#contact" class="nav-link hover:text-primary transition-colors-all">05: /CommLink</a></li>
             </ul>
 
-            <a href="#contact" class="hidden md:block px-5 py-2 bg-primary text-gray-900 font-bold rounded-full hover:bg-cyan-300 transition-colors-all">Let's Talk</a>
+            <a href="#contact" class="hidden md:block px-5 py-2 bg-primary text-gray-900 font-bold rounded-full hover:bg-cyan-300 transition-colors-all system-glow">INITIATE_COMM</a>
 
             <button id="menu-toggle" class="md:hidden text-2xl hover:text-primary focus:outline-none">
                 <svg id="icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 <svg id="icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </nav>
-
         <ul id="mobile-menu" class="md:hidden hidden absolute top-full left-0 w-full bg-gray-900/95 backdrop-blur-md shadow-xl border-t border-gray-800 text-center py-4 space-y-4 text-xl font-medium">
-            <li><a href="#about" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">About</a></li>
-            <li><a href="#skills" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Skills</a></li>
-            <li><a href="#services" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Services</a></li>
-            <li><a href="#projects" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Projects</a></li>
-            <li><a href="#contact" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">Contact</a></li>
-            <li><a href="#contact" class="block py-2 px-5 bg-primary text-gray-900 font-bold rounded-full mx-auto w-3/4 mt-4 hover:bg-cyan-300 transition-colors-all">Hire Samuel</a></li>
+            <li><a href="#about" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">01: /About</a></li>
+            <li><a href="#skills" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">02: /Diagnostics</a></li>
+            <li><a href="#services" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">03: /Capabilities</a></li>
+            <li><a href="#projects" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">04: /DataLogs</a></li>
+            <li><a href="#contact" class="block py-2 hover:bg-gray-800 hover:text-primary transition-colors-all">05: /CommLink</a></li>
+            <li><a href="#contact" class="block py-2 px-5 bg-primary text-gray-900 font-bold rounded-full mx-auto w-3/4 mt-4 hover:bg-cyan-300 transition-colors-all system-glow">INITIATE_COMM</a></li>
         </ul>
     </header>
 
     <main>
-        <section id="hero" class="relative overflow-hidden pt-24 pb-32 bg-gray-900 min-h-[80vh]">
-            <div id="hero-bg" class="hero-bg absolute inset-0 opacity-10 pointer-events-none transition-all duration-100 ease-linear">
-                <div class="h-full w-full bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <section id="hero" class="relative overflow-hidden pt-32 pb-48 min-h-[90vh] flex items-center">
+            <div id="hero-bg" class="hero-bg circuit-bg absolute inset-0 opacity-15 pointer-events-none transition-all duration-100 ease-linear z-10"></div>
+
+            <div class="absolute inset-0 flex items-center justify-center z-10">
+                <div class="w-96 h-96 bg-primary rounded-full blur-[100px] opacity-10 system-glow"></div>
             </div>
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-12 z-10 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-12 z-20 relative">
                 <div class="md:w-3/5 lg:w-1/2 text-center md:text-left animate-fade-in">
-                    <p class="text-lg uppercase tracking-widest font-semibold text-gray-400 mb-2">Hello, I'm</p>
-                    <h2 class="text-6xl sm:text-7xl font-extrabold leading-tight text-white mb-4">
+                    <p id="system-status" class="text-lg uppercase tracking-widest font-primary text-secondary mb-4">
+                        [ SYSTEM_CALL: Status.Retrieval... <span class="text-primary">ONLINE</span> ]
+                    </p>
+
+                    <h2 id="hero-main-title" class="text-6xl sm:text-7xl font-display font-extrabold leading-tight text-white mb-4">
                         <span class="text-primary block">Samuel</span>
                         <span class="block">The Tech Innovator</span>
                     </h2>
-                    <p id="hero-subtitle" class="hero-subtitle text-2xl text-gray-300 mb-6 font-light">Full-Stack Developer</p>
-                    
-                    <p class="text-gray-400 max-w-lg mx-auto md:mx-0 mb-10 animate-fade-in">
-                        I specialize in architecting efficient, scalable web applications, mobile apps, and custom automation tools to transform complex ideas into robust, deployed solutions.
+
+                    <p id="hero-subtitle" class="text-3xl text-gray-300 mb-8 font-primary font-light text-glitch-placeholder">Initializing...</p>
+
+                    <p class="text-gray-400 max-w-lg mx-auto md:mx-0 mb-10 animate-fade-in text-lg">
+                        Processing complex requirements into functional, scalable, and fully optimized digital architectures. My expertise is the transformation of abstract concepts into deployed, production-ready systems.
                     </p>
-                    <a href="#projects" class="inline-block px-10 py-4 bg-primary text-gray-900 font-extrabold rounded-lg shadow-xl shadow-primary/30 hover:bg-cyan-300 transition-colors-all text-xl animate-fade-in">
-                        View My Work →
+
+                    <a href="#projects" class="inline-block px-10 py-4 bg-primary text-gray-900 font-extrabold rounded-lg shadow-xl shadow-primary/30 hover:bg-cyan-300 transition-colors-all text-xl system-glow animate-fade-in">
+                        ACCESS DATA LOGS →
                     </a>
                 </div>
                 <div class="md:w-2/5 lg:w-1/2 mt-12 md:mt-0 animate-fade-in">
-                    <img src="[Image of a professional software developer working on multiple screens with code overlays].jpg" alt="Professional software developer working on multiple screens with code overlays" class="w-full h-auto rounded-lg shadow-lg">
+                    <div class="w-full h-80 bg-gray-800 rounded-lg shadow-2xl border-2 border-primary/50 flex items-center justify-center">
+                        <p class="text-primary text-2xl font-primary animate-pulse">RENDER: [ CORE_VISUAL_INTERFACE ]</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="py-20 lg:py-32 bg-gray-900">
+        <section id="about" class="py-24 lg:py-36 bg-gray-900/50 border-t border-b border-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
-                    <span class="text-primary">|</span> About Me
+                <h2 class="text-4xl sm:text-5xl font-display font-bold text-center mb-20 animate-slide-up">
+                    <span class="text-primary">[</span> CORE PROFILE <span class="text-primary">]</span>
                 </h2>
-                <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
                     <div class="text-lg space-y-6 text-gray-300 animate-fade-in">
-                        <p>I'm a passionate developer with a **1 year track record** in building complete digital solutions. My expertise spans from pixel-perfect frontends with **React/Next.js** to high-performance, secure backends using **Node.js, Express, and MongoDB.**</p>
-                        <p>My core philosophy is delivering **high-quality, innovative solutions** that are user-centric and easily scalable. I pride myself on clean code, modern development practices (Agile/Scrum), and a relentless focus on problem-solving.</p>
-                        <a href="#contact" class="inline-block mt-4 text-primary hover:text-cyan-300 font-semibold underline underline-offset-4">Ready to collaborate on your next big idea?</a>
+                        <p class="text-primary font-bold">// INITIALIZING_BIOGRAPHY_STREAM...</p>
+                        <p>I function as a Full-Stack development unit, possessing a **1 year track record** in building efficient and fault-tolerant digital solutions. My primary data protocols include **React/Next.js (Frontend UI)** and **Node.js/MongoDB (Backend Architecture).**</p>
+                        <p>I operate on a **High-Quality, Zero-Error** philosophy, employing modern development practices (Agile/Scrum) to ensure every deployed solution is scalable and robust. I am ready for **system-level integration** into your team.</p>
+                        <a href="#contact" class="inline-block mt-4 text-primary hover:text-secondary font-semibold underline underline-offset-8 transition-colors duration-300">REQUEST_COLLABORATION_PROTOCOL</a>
                     </div>
                     <div class="grid grid-cols-3 gap-6 text-center animate-fade-in">
-                        <div class="p-6 bg-gray-800 rounded-xl shadow-2xl transition-all border border-gray-700">
-                            <h3 class="text-4xl font-extrabold text-primary">1</h3>
-                            <p class="text-gray-400 mt-2">Year Experience</p>
+                        <div class="data-card p-6 rounded-xl shadow-2xl transition-all border-l-4 border-primary">
+                            <h3 class="text-4xl font-display font-extrabold text-primary system-glow">1</h3>
+                            <p class="text-gray-400 mt-2 text-sm">YEARS_ONLINE</p>
                         </div>
-                        <div class="p-6 bg-gray-800 rounded-xl shadow-2xl transition-all border border-gray-700">
-                            <h3 class="text-4xl font-extrabold text-primary">10+</h3>
-                            <p class="text-gray-400 mt-2">Projects Completed</p>
+                        <div class="data-card p-6 rounded-xl shadow-2xl transition-all border-l-4 border-primary">
+                            <h3 class="text-4xl font-display font-extrabold text-primary system-glow">10+</h3>
+                            <p class="text-gray-400 mt-2 text-sm">PROJECTS_DEPLOYED</p>
                         </div>
-                        <div class="p-6 bg-gray-800 rounded-xl shadow-2xl transition-all border border-gray-700">
-                            <h3 class="text-4xl font-extrabold text-primary">100%</h3>
-                            <p class="text-gray-400 mt-2">Client Satisfaction</p>
+                        <div class="data-card p-6 rounded-xl shadow-2xl transition-all border-l-4 border-primary">
+                            <h3 class="text-4xl font-display font-extrabold text-primary system-glow">100%</h3>
+                            <p class="text-gray-400 mt-2 text-sm">SATISFACTION_RATING</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="skills" class="py-20 lg:py-32 bg-gray-800">
+        <section id="skills" class="py-24 lg:py-36 bg-gray-800/60 border-b border-gray-700">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
-                    <span class="text-primary">|</span> My Tech Stack
+                <h2 class="text-4xl sm:text-5xl font-display font-bold text-center mb-20 animate-slide-up">
+                    <span class="text-primary">[</span> SYSTEM DIAGNOSTICS <span class="text-primary">]</span>
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
-                        <div class="text-3xl mb-3">💻</div>
-                        <h3 class="text-2xl font-semibold mb-3 text-white">Frontend</h3>
-                        <p class="text-gray-400">HTML5, CSS3, **JavaScript, TypeScript**</p>
-                        <p class="text-gray-400 font-medium">**React, Next.js, Tailwind CSS**</p>
+                    <div class="data-card rounded-xl shadow-xl border border-gray-700 animate-fade-in">
+                        <div class="data-card-header p-4 flex justify-between items-center scanned-target">
+                            <h3 class="text-xl font-display font-semibold text-primary">01: UI_RENDER_UNIT</h3>
+                            <span class="text-sm text-secondary">STATUS: OPTIMAL</span>
+                        </div>
+                        <div class="p-6 space-y-2">
+                            <p class="text-gray-400">Primary Languages: **JS/TS**</p>
+                            <p class="text-gray-400 font-medium">Frameworks: **React, Next.js**</p>
+                            <p class="text-gray-400">Styling: **Tailwind CSS**</p>
+                            <div class="w-full bg-gray-700 h-1 mt-3"><div class="bg-primary h-1 w-[90%] system-glow"></div></div>
+                        </div>
                     </div>
-                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
-                        <div class="text-3xl mb-3">⚙️</div>
-                        <h3 class="text-2xl font-semibold mb-3 text-white">Backend & DB</h3>
-                        <p class="text-gray-400">**Node.js, Express.js, Python**</p>
-                        <p class="text-gray-400 font-medium">**MongoDB**, REST & GraphQL APIs</p>
+                    <div class="data-card rounded-xl shadow-xl border border-gray-700 animate-fade-in" data-delay="100">
+                        <div class="data-card-header p-4 flex justify-between items-center">
+                            <h3 class="text-xl font-display font-semibold text-primary">02: DATA_PROCESSING_UNIT</h3>
+                            <span class="text-sm text-secondary">STATUS: OPTIMAL</span>
+                        </div>
+                        <div class="p-6 space-y-2">
+                            <p class="text-gray-400">Server Run Environment: **Node.js**</p>
+                            <p class="text-gray-400 font-medium">API Layer: **Express.js, GraphQL**</p>
+                            <p class="text-gray-400">Data Storage: **MongoDB**</p>
+                            <div class="w-full bg-gray-700 h-1 mt-3"><div class="bg-primary h-1 w-[85%] system-glow"></div></div>
+                        </div>
                     </div>
-                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
-                        <div class="text-3xl mb-3">🛠️</div>
-                        <h3 class="text-2xl font-semibold mb-3 text-white">DevOps & Tools</h3>
-                        <p class="text-gray-400">**Git, GitHub, Docker**</p>
-                        <p class="text-gray-400 font-medium">AWS, Vercel, CI/CD</p>
+                    <div class="data-card rounded-xl shadow-xl border border-gray-700 animate-fade-in" data-delay="200">
+                        <div class="data-card-header p-4 flex justify-between items-center">
+                            <h3 class="text-xl font-display font-semibold text-primary">03: DEPLOYMENT_MODULE</h3>
+                            <span class="text-sm text-secondary">STATUS: OPTIMAL</span>
+                        </div>
+                        <div class="p-6 space-y-2">
+                            <p class="text-gray-400">Version Control: **Git, GitHub**</p>
+                            <p class="text-gray-400 font-medium">Containerization: **Docker**</p>
+                            <p class="text-gray-400">Cloud/CI/CD: **AWS, Vercel**</p>
+                            <div class="w-full bg-gray-700 h-1 mt-3"><div class="bg-primary h-1 w-[80%] system-glow"></div></div>
+                        </div>
                     </div>
-                    <div class="p-6 bg-gray-900 rounded-xl shadow-xl border-t-4 border-primary animate-fade-in">
-                        <div class="text-3xl mb-3">📱</div>
-                        <h3 class="text-2xl font-semibold mb-3 text-white">Mobile & Scripts</h3>
-                        <p class="text-gray-400">Android Dev, **Kotlin**</p>
-                        <p class="text-gray-400 font-medium">**Flutter, Dart**</p>
+                    <div class="data-card rounded-xl shadow-xl border border-gray-700 animate-fade-in" data-delay="300">
+                        <div class="data-card-header p-4 flex justify-between items-center">
+                            <h3 class="text-xl font-display font-semibold text-primary">04: AUTOMATION_SCRIPT</h3>
+                            <span class="text-sm text-secondary">STATUS: OPTIMAL</span>
+                        </div>
+                        <div class="p-6 space-y-2">
+                            <p class="text-gray-400">Mobile Stack: **Flutter, Kotlin**</p>
+                            <p class="text-gray-400 font-medium">Scripting: **Python**</p>
+                            <p class="text-gray-400">Function: **Data Scraping, Automation**</p>
+                            <div class="w-full bg-gray-700 h-1 mt-3"><div class="bg-primary h-1 w-[95%] system-glow"></div></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <section id="services" class="py-20 lg:py-32 bg-gray-900">
+        
+        <section id="services" class="py-24 lg:py-36 bg-gray-900/50 border-t border-b border-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
-                    <span class="text-primary">|</span> Services Offered
+                <h2 class="text-4xl sm:text-5xl font-display font-bold text-center mb-20 animate-slide-up">
+                    <span class="text-primary">[</span> SYSTEM CAPABILITIES <span class="text-primary">]</span>
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
-                        <div class="text-5xl mb-4 text-primary">🌐</div>
-                        <h3 class="text-2xl font-bold mb-3 text-white">Full-Stack Web Apps</h3>
-                        <p class="text-gray-400">Building scalable, high-performance web applications from concept to deployment using modern MERN stack or Next.js.</p>
+                    <div class="group data-card p-8 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
+                        <div class="text-5xl mb-4 text-primary font-display">W.A.</div>
+                        <h3 class="text-2xl font-display font-bold mb-3 text-white">Full-Stack Web Apps</h3>
+                        <p class="text-gray-400">Constructing robust, scalable web platforms using MERN stack and Next.js, built for high concurrency.</p>
                     </div>
-                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
-                        <div class="text-5xl mb-4 text-primary">📱</div>
-                        <h3 class="text-2xl font-bold mb-3 text-white">Cross-Platform Mobile</h3>
-                        <p class="text-gray-400">Developing native-quality mobile applications for Android/iOS using **Flutter** and Native Android (Kotlin).</p>
+                    <div class="group data-card p-8 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in" data-delay="100">
+                        <div class="text-5xl mb-4 text-primary font-display">C.P.M.</div>
+                        <h3 class="text-2xl font-display font-bold mb-3 text-white">Cross-Platform Mobile</h3>
+                        <p class="text-gray-400">Developing native-quality apps for Android/iOS, leveraging Flutter and native Kotlin for maximum reach.</p>
                     </div>
-                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
-                        <div class="text-5xl mb-4 text-primary">🤖</div>
-                        <h3 class="text-2xl font-bold mb-3 text-white">Automation & Tools</h3>
-                        <p class="text-gray-400">Creating custom Python and Node.js scripts for data scraping, workflow automation, and repetitive task elimination.</p>
+                    <div class="group data-card p-8 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in" data-delay="200">
+                        <div class="text-5xl mb-4 text-primary font-display">A.T.</div>
+                        <h3 class="text-2xl font-display font-bold mb-3 text-white">Automation & Tools</h3>
+                        <p class="text-gray-400">Creating custom Python/Node.js scripts to automate tasks, eliminate repetitive labor, and manage data.</p>
                     </div>
-                    <div class="group p-8 bg-gray-800 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in">
-                        <div class="text-5xl mb-4 text-primary">🔧</div>
-                        <h3 class="text-2xl font-bold mb-3 text-white">Custom Extensions</h3>
-                        <p class="text-gray-400">Designing and building powerful, secure browser extensions to enhance user productivity and workflow integration.</p>
+                    <div class="group data-card p-8 rounded-xl shadow-lg border border-gray-700 hover:border-primary animate-fade-in" data-delay="300">
+                        <div class="text-5xl mb-4 text-primary font-display">E.M.</div>
+                        <h3 class="text-2xl font-display font-bold mb-3 text-white">Custom Extensions</h3>
+                        <p class="text-gray-400">Designing and deploying powerful browser extensions for workflow enhancement and system integration.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="projects" class="py-20 lg:py-32 bg-gray-800">
+        <section id="projects" class="py-24 lg:py-36 bg-gray-800/60 border-b border-gray-700">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
-                    <span class="text-primary">|</span> Featured Projects
+                <h2 class="text-4xl sm:text-5xl font-display font-bold text-center mb-20 animate-slide-up">
+                    <span class="text-primary">[</span> ENCRYPTED DATA LOGS <span class="text-primary">]</span>
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    <a href="https://adminpaneldash.netlify.app" target="_blank" class="block group animate-fade-in">
-                        <div class="bg-gray-900 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
-                            <img src="admin panel dashboard.png" alt="Admin Panel Dashboard" class="w-full h-48 object-cover">
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold mb-2 text-primary">Admin Panel Dashboard</h3>
-                                <p class="text-gray-400 text-sm">A comprehensive admin dashboard with user management, analytics, and reporting features.</p>
-                            </div>
+                    <a href="https://adminpaneldash.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
+                        <div class="w-full h-48 bg-cover bg-center border-b border-primary/50" style="background-image: url('admin panel dashboard.png');"></div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-display font-bold mb-2 text-primary scanned-target">ADMIN PANEL DASHBOARD</h3>
+                            <p class="text-gray-400 text-sm">Log ID: 7A-44B | <span class="text-secondary">STATUS: DEPLOYED</span></p>
+                            <p class="text-gray-400 mt-2">Comprehensive data management interface with live analytics and reporting protocols.</p>
                         </div>
                     </a>
-                    <a href="https://wagerwager.netlify.app" target="_blank" class="block group animate-fade-in">
-                        <div class="bg-gray-900 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
-                            <img src="wagerwager.png" alt="Wagerwager" class="w-full h-48 object-cover">
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold mb-2 text-primary">Wagerwager</h3>
-                                <p class="text-gray-400 text-sm">An interactive wagering platform with modern UI and real-time features.</p>
-                            </div>
+                    <a href="https://wagerwager.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
+                        <div class="w-full h-48 bg-cover bg-center border-b border-primary/50" style="background-image: url('wagerwager.png');"></div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-display font-bold mb-2 text-primary scanned-target">WAGERWAGER</h3>
+                            <p class="text-gray-400 text-sm">Log ID: 9C-92F | <span class="text-secondary">STATUS: INTERACTIVE</span></p>
+                            <p class="text-gray-400 mt-2">Real-time wagering platform with secure user authentication and dynamic UI/UX.</p>
                         </div>
                     </a>
-                    <a href="https://studentdashsam.netlify.app" target="_blank" class="block group animate-fade-in">
-                        <div class="bg-gray-900 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
-                            <img src="student dashboard.png" alt="Student Dashboard" class="w-full h-48 object-cover">
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold mb-2 text-primary">Student Dashboard</h3>
-                                <p class="text-gray-400 text-sm">A student management system with course tracking, grades, and progress monitoring.</p>
-                            </div>
+                    <a href="https://studentdashsam.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
+                        <div class="w-full h-48 bg-cover bg-center border-b border-primary/50" style="background-image: url('student dashboard.png');"></div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-display font-bold mb-2 text-primary">STUDENT DASHBOARD</h3>
+                            <p class="text-gray-400 text-sm">Log ID: 2B-11A | <span class="text-secondary">STATUS: MONITORING</span></p>
+                            <p class="text-gray-400 mt-2">Educational management system tracking student progress, grades, and course metrics.</p>
                         </div>
                     </a>
                 </div>
-                <div class="text-center mt-16 animate-fade-in">
-                    <a href="https://github.com/Kuro-sam1210" target="_blank" class="inline-block px-8 py-3 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary/20 transition-all">
-                        View All 10+ Projects on GitHub
+                <div class="text-center mt-20 animate-fade-in">
+                    <a href="https://github.com/Kuro-sam1210" target="_blank" class="inline-block px-8 py-3 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary/20 transition-all system-glow">
+                        // VIEW ALL DATA ARCHIVES (GitHub)
                     </a>
                 </div>
             </div>
         </section>
 
-        <section id="contact" class="py-20 lg:py-32 bg-gray-900">
+        <section id="contact" class="py-24 lg:py-36 bg-gray-900/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl sm:text-5xl font-bold text-center mb-16 animate-slide-up">
-                    <span class="text-primary">|</span> Let's Create Together
+                <h2 class="text-4xl sm:text-5xl font-display font-bold text-center mb-20 animate-slide-up">
+                    <span class="text-primary">[</span> INITIATE COMM_LINK <span class="text-primary">]</span>
                 </h2>
-                <div class="grid md:grid-cols-2 gap-12 bg-gray-800 p-8 md:p-12 rounded-xl shadow-2xl animate-fade-in">
-                    <div class="space-y-6">
-                        <h3 class="text-3xl font-bold text-white mb-6">Contact Information</h3>
-                        <div class="flex items-center space-x-4">
-                            <span class="text-2xl text-primary">📧</span>
-                            <span class="text-lg text-gray-300">samuelmajasan6@gmail.com</span>
+                <div class="grid md:grid-cols-2 gap-16 bg-gray-800/50 p-8 md:p-12 rounded-xl shadow-2xl border border-primary/30 animate-fade-in">
+                    <div class="space-y-8">
+                        <h3 class="text-3xl font-display font-bold text-white mb-6">TRANSMISSION PROTOCOLS</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-4">
+                                <span class="text-2xl text-primary font-display">MAIL:</span>
+                                <span class="text-lg text-gray-300">samuelmajasan6@gmail.com</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-2xl text-primary font-display">COMMS:</span>
+                                <span class="text-lg text-gray-300">+234 706 956 8320 (WhatsApp)</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-2xl text-primary font-display">ALIAS:</span>
+                                <span class="text-lg text-gray-300">@Samuel121004 (Telegram)</span>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <span class="text-2xl text-primary">📱</span>
-                            <span class="text-lg text-gray-300">+234 706 956 8320 (WhatsApp)</span>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <span class="text-2xl text-primary">💬</span>
-                            <span class="text-lg text-gray-300">@Samuel121004 (Telegram)</span>
-                        </div>
-                        <div class="pt-8">
-                            <h4 class="text-xl font-semibold text-white mb-3">Find Me Online</h4>
+
+                        <div class="pt-8 border-t border-gray-700">
+                            <h4 class="text-xl font-display font-semibold text-white mb-4">SYSTEM LINKS</h4>
                             <div class="flex space-x-6">
-                                <a href="https://github.com/Kuro-sam1210" target="_blank" class="text-2xl text-gray-400 hover:text-primary transition-colors-all">GitHub</a>
-                                <a href="https://www.linkedin.com/in/samuel-majasan-1714662aa/" target="_blank" class="text-2xl text-gray-400 hover:text-primary transition-colors-all">LinkedIn</a>
+                                <a href="https://github.com/Kuro-sam1210" target="_blank" class="text-2xl text-gray-400 hover:text-primary transition-colors-all">GITHUB</a>
+                                <a href="https://www.linkedin.com/in/samuel-majasan-1714662aa/" target="_blank" class="text-2xl text-gray-400 hover:text-primary transition-colors-all">LINKEDIN</a>
                             </div>
                         </div>
                     </div>
 
                     <form id="contact-form" class="space-y-6">
-                        <input type="text" name="name" placeholder="Your Name" required class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white">
-                        <input type="email" name="email" placeholder="Your Email" required class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white">
-                        <textarea name="message" placeholder="Your Message" required rows="5" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white"></textarea>
-                        <button type="submit" class="w-full py-4 bg-primary text-gray-900 font-extrabold rounded-lg hover:bg-cyan-300 transition-colors-all text-lg shadow-lg shadow-primary/30">
-                            Send Secure Message
+                        <input type="text" name="name" placeholder="[ INPUT: YOUR_IDENTIFIER ]" required class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white font-primary">
+                        <input type="email" name="email" placeholder="[ INPUT: YOUR_PROTOCOL_ADDRESS ]" required class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white font-primary">
+                        <textarea name="message" placeholder="[ INPUT: MESSAGE_PAYLOAD ]" required rows="5" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-500 text-white font-primary"></textarea>
+                        <button type="submit" class="w-full py-4 bg-primary text-gray-900 font-extrabold rounded-lg hover:bg-secondary transition-colors-all text-lg system-glow shadow-lg shadow-primary/50">
+                            TRANSMIT_SECURE_MESSAGE
                         </button>
                     </form>
                 </div>
@@ -270,16 +662,12 @@
     </main>
 
     <footer class="bg-gray-900 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-400">
-            <p>&copy; 2024 Samuel. Full-Stack Development & Innovation.</p>
-            <div class="mt-4 space-x-4 text-sm">
-                <a href="#about" class="hover:text-primary transition-colors-all">About</a>
-                <a href="#services" class="hover:text-primary transition-colors-all">Services</a>
-                <a href="#contact" class="hover:text-primary transition-colors-all">Contact</a>
-            </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-500 font-primary">
+            <p>// LOG_END: © 2024 Samuel. CORE_SYSTEM_ONLINE.</p>
         </div>
     </footer>
 
     <script src="script.js"></script>
+    <script src="eye.js"></script>
 </body>
 </html>
