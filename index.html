@@ -171,6 +171,16 @@
             animation: title-breathe 8s ease-in-out infinite;
         }
 
+        /* Scan reveal effect */
+        #hero-description-scan {
+            opacity: 0;
+            transition: opacity 0.1s linear;
+        }
+
+        #hero-description-scan.scanned {
+            opacity: 1;
+        }
+
         /* CSS for the Iris/Pupil to interact with the JS */
         #iris {
             transition: all 0.2s ease-out; /* Smooth movement when reacting to pupil */
@@ -622,7 +632,7 @@
 
                     <p id="hero-subtitle" class="text-3xl text-gray-300 mb-8 font-primary font-light text-glitch-placeholder">Initializing...</p>
 
-                    <p class="text-gray-400 max-w-lg mx-auto md:mx-0 mb-10 animate-fade-in text-lg">
+                    <p id="hero-description-scan" class="text-gray-400 max-w-lg mx-auto md:mx-0 mb-10 animate-fade-in text-lg scanned-target">
                         Processing complex requirements into functional, scalable, and fully optimized digital architectures. My expertise is the transformation of abstract concepts into deployed, production-ready systems.
                     </p>
 
@@ -761,7 +771,7 @@
                 <h2 class="text-4xl sm:text-5xl font-display font-bold text-center mb-20 animate-slide-up">
                     <span class="text-primary">[</span> ENCRYPTED DATA LOGS <span class="text-primary">]</span>
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                     <a href="https://adminpaneldash.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
                         <img src="admin panel dashboard.png" alt="Admin Panel Dashboard" class="w-full h-48 object-cover border-b border-primary/50" loading="lazy">
                         <div class="p-6">
@@ -781,9 +791,17 @@
                     <a href="https://studentdashsam.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
                         <img src="student dashboard.png" alt="Student Dashboard" class="w-full h-48 object-cover border-b border-primary/50" loading="lazy">
                         <div class="p-6">
-                            <h3 class="text-xl font-display font-bold mb-2 text-primary">STUDENT DASHBOARD</h3>
+                            <h3 class="text-xl font-display font-bold mb-2 text-primary scanned-target">STUDENT DASHBOARD</h3>
                             <p class="text-gray-400 text-sm">Log ID: 2B-11A | <span class="text-secondary">STATUS: MONITORING</span></p>
                             <p class="text-gray-400 mt-2">Educational management system tracking student progress, grades, and course metrics.</p>
+                        </div>
+                    </a>
+                    <a href="https://marketecomtest.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
+                        <img src="market.png" alt="Market E-commerce" class="w-full h-48 object-cover border-b border-primary/50" loading="lazy">
+                        <div class="p-6">
+                            <h3 class="text-xl font-display font-bold mb-2 text-primary scanned-target">MARKET E-COMMERCE</h3>
+                            <p class="text-gray-400 text-sm">Log ID: 4D-77C | <span class="text-secondary">STATUS: ACTIVE</span></p>
+                            <p class="text-gray-400 mt-2">Full-featured e-commerce platform with product catalog, shopping cart, and payment integration.</p>
                         </div>
                     </a>
                 </div>

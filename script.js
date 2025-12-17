@@ -939,6 +939,33 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.setProperty('--color-primary', theme.css);
     }
 
+    // Scan animation for description text
+    function scanDescriptionIntoExistence() {
+        const descElement = document.getElementById('hero-description-scan');
+        if (!descElement) return;
+
+        const text = descElement.textContent;
+        descElement.textContent = '';
+        descElement.classList.remove('scanned');
+        
+        let charIndex = 0;
+        const scanInterval = setInterval(() => {
+            if (charIndex < text.length) {
+                descElement.textContent += text[charIndex];
+                charIndex++;
+            } else {
+                clearInterval(scanInterval);
+                descElement.classList.add('scanned');
+            }
+        }, 10); // ~10ms per character = ~5 seconds for full text
+    }
+
+    // Trigger scan 2 seconds after page load
+    setTimeout(() => {
+        console.log('Initiating observer scan...');
+        scanDescriptionIntoExistence();
+    }, 2000);
+
     // Devil Glitch
     function triggerDevilGlitch() {
         // Sudden snap to Devil
@@ -954,7 +981,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     }
 
-    // Trigger devil glitch 5 seconds after page load
+    // Trigger devil glitch 10 seconds after page load (after scan completes)
     setTimeout(() => {
         console.log('Triggering initial devil glitch...');
         triggerDevilGlitch();
