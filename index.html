@@ -6,6 +6,8 @@
     <title>Samuel - CORE: Biomechanical System Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     
     <style>
         /* ========================================================================= */
@@ -364,9 +366,117 @@
             transform-origin: left center;
         }
 
+        /* Three.js Earth Preloader Styles */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #preloader-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .boot-interface {
+            position: relative;
+            z-index: 2; /* Sits on top of the Earth */
+            pointer-events: none;
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            color: var(--color-primary);
+        }
+
+        .loading-bar-container {
+            width: 250px;
+            height: 2px;
+            background: rgba(0, 255, 242, 0.2);
+            margin: 20px auto;
+        }
+
+        #progress-fill {
+            width: 0%;
+            height: 2px;
+            background: var(--color-primary);
+            box-shadow: 0 0 15px var(--color-primary);
+            transition: width 0.2s ease-out;
+        }
+
+        /* Scanner Line Effect */
+        .scanner-line {
+            position: absolute;
+            width: 300px;
+            height: 10px;
+            background: linear-gradient(to bottom, transparent, var(--color-primary), transparent);
+            opacity: 0.3;
+            animation: scan 2s infinite;
+        }
+
+        @keyframes scan {
+            0% { top: -100px; }
+            100% { top: 100px; }
+        }
+
+        /* Observer Shell Layout */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1; /* Sits behind text, but eye mesh will be prominent */
+        }
+
+        #preloader-ui {
+            position: absolute;
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* The glitch effect for when the Guardian "patches" a bug */
+        .system-patching {
+            filter: hue-rotate(180deg) brightness(1.5);
+            transition: filter 0.2s;
+        }
+
+        /* Extreme chromatic aberration and flicker */
+        .emergency-glitch {
+            animation: rapid-flicker 0.1s infinite;
+            filter: hue-rotate(90deg) contrast(200%);
+        }
+
+        @keyframes rapid-flicker {
+            0% { opacity: 1; transform: translateX(0); }
+            25% { opacity: 0.8; transform: translateX(-5px); }
+            50% { opacity: 0.9; transform: translateX(5px); }
+            75% { opacity: 0.4; transform: scale(1.1); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 font-primary tracking-tight">
+
+    <div id="app">
+        <div id="canvas-container"></div>
+
+        <div id="preloader-ui">
+            <div class="hud-scanner"></div>
+            <h1 class="glitch" data-text="INITIALIZING_GUARDIAN">INITIALIZING_GUARDIAN</h1>
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <p id="status-text">MAPPING_NEURAL_NODES..._</p>
+        </div>
+
+        <main id="main-content" style="opacity: 0;">
 
     <audio id="system-tick-audio" loop preload="auto">
         <source src="tick.mp3" type="audio/mpeg">
@@ -666,6 +776,9 @@
             <p>// LOG_END: © 2024 Samuel. CORE_SYSTEM_ONLINE.</p>
         </div>
     </footer>
+
+        </main>
+    </div>
 
     <script src="script.js"></script>
     <script src="eye.js"></script>

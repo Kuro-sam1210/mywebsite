@@ -287,4 +287,126 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Three.js Observer Shell Preloader
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    // 1. The Anatomical Particle Eye
+    const particleCount = 12000;
+    const geometry = new THREE.BufferGeometry();
+    const pos = new Float32Array(particleCount * 3);
+    const targets = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+        // Chaos Start
+        pos[i*3] = (Math.random()-0.5)*50;
+        pos[i*3+1] = (Math.random()-0.5)*50;
+        pos[i*3+2] = (Math.random()-0.5)*50;
+
+        // Eye Target Math (Sphere + Iris Dent)
+        const phi = Math.acos(-1 + (2 * i) / particleCount);
+        const theta = Math.sqrt(particleCount * Math.PI) * phi;
+        let x = 3 * Math.cos(theta) * Math.sin(phi);
+        let y = 3 * Math.sin(theta) * Math.sin(phi);
+        let z = 3 * Math.cos(phi);
+
+        // Create the "Iris Dent" on the front (z > 2)
+        const distToFront = Math.sqrt(x*x + y*y + (z-3)*(z-3));
+        if(distToFront < 1.8) { z -= 0.6; } // Carve the pupil hole
+
+        targets[i*3] = x;
+        targets[i*3+1] = y;
+        targets[i*3+2] = z;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const material = new THREE.PointsMaterial({ size: 0.04, color: 0x00fff2, transparent: true, blending: THREE.AdditiveBlending });
+    const eyeMesh = new THREE.Points(geometry, material);
+    scene.add(eyeMesh);
+
+    camera.position.z = 10;
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // 3. The "Awakening" & Drift
+    let isLoaded = false;
+
+    function awakeGuardian() {
+        const tl = gsap.timeline();
+
+        // Assemble the eye
+        let assemblyProgress = 0;
+        tl.to({progress: 1}, {
+            progress: 1,
+            duration: 4,
+            ease: "power3.inOut",
+            onUpdate: () => {
+                assemblyProgress = tl.progress();
+                const currentArray = geometry.attributes.position.array;
+
+                // Interpolate positions
+                for (let i = 0; i < particleCount * 3; i++) {
+                    currentArray[i] = pos[i] + (targets[i] - pos[i]) * assemblyProgress;
+                }
+
+                geometry.attributes.position.needsUpdate = true;
+            }
+        })
+        .to(material, { size: 0.08, duration: 0.3, yoyo: true, repeat: 1 }) // Flash!
+        .to('#preloader-ui', { opacity: 0, duration: 1 })
+        .to(eyeMesh.position, {
+            x: 6, y: 3, z: -5, // Drift to top-right corner
+            duration: 2,
+            ease: "power2.inOut"
+        })
+        .to(eyeMesh.scale, { x: 0.5, y: 0.5, z: 0.5, duration: 2 }, "-=2")
+        .to('#main-content', { opacity: 1, duration: 1 }, "-=1");
+
+        isLoaded = true;
+    }
+
+    // 4. The Bug Patching Reaction
+    function patchBugReaction() {
+        gsap.to(material.color, { r: 1, g: 0, b: 0, duration: 0.1 }); // Turn Red
+        gsap.to(eyeMesh.scale, { x: 0.7, y: 0.7, z: 0.7, yoyo: true, repeat: 1, duration: 0.2 }); // Pulse
+        setTimeout(() => {
+            gsap.to(material.color, { r: 0, g: 1, b: 0.95, duration: 0.5 }); // Turn back to Cyan
+        }, 500);
+    }
+
+    // 5. Interactive Eye Rotation
+    let mouse = { x: 0, y: 0 };
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = (e.clientX / window.innerWidth) - 0.5;
+        mouse.y = (e.clientY / window.innerHeight) - 0.5;
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        // Look-at logic (follows mouse with a slight lag)
+        if (isLoaded) {
+            eyeMesh.rotation.y += (mouse.x * 1.5 - eyeMesh.rotation.y) * 0.1;
+            eyeMesh.rotation.x += (-mouse.y * 1.5 - eyeMesh.rotation.x) * 0.1;
+        }
+
+        renderer.render(scene, camera);
+    }
+
+    animate();
+    window.addEventListener('load', awakeGuardian);
+
+    // Export the patch function (for use in other scripts)
+    window.patchBugReaction = patchBugReaction;
+
 });
