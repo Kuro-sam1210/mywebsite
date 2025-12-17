@@ -850,7 +850,8 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .to(eyeMesh.scale, { x: 0.5, y: 0.5, z: 0.5, duration: 2 }, "-=2")
         .to(material, { opacity: 0.3, duration: 0.5 }) // Set to 0.3 like SVG
-        .to('#main-content', { opacity: 1, duration: 1 }, "-=1");
+        .to('#main-content', { opacity: 1, duration: 1 }, "-=1")
+        .to('#canvas-container', { pointerEvents: 'none', duration: 0 }, "-=1"); // Allow clicks through canvas
 
         isLoaded = true;
 
