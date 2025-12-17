@@ -13,12 +13,32 @@
         /* ========================================================================= */
         /* 1. THEMATIC STYLES: COLORS & FONTS */
         /* ========================================================================= */
-        :root { 
+        :root {
             --color-primary: #00ffff; /* Electric Cyan */
             --color-secondary: #ff00ff; /* Pulsing Magenta */
-            --color-shadow: 0, 255, 255; 
+            --color-shadow: 0, 255, 255;
             --global-pulse: 1; /* JS controlled heartbeat */
             --bg-color: #0d0d0d;
+        }
+
+        /* Theme Variants */
+        [data-theme="neon"] {
+            --color-primary: #00ff00; /* Neon Green */
+            --color-secondary: #8000ff; /* Electric Purple */
+            --color-shadow: 0, 255, 0;
+        }
+
+        [data-theme="retro"] {
+            --color-primary: #ff6b00; /* Retro Orange */
+            --color-secondary: #0080ff; /* Electric Blue */
+            --color-shadow: 255, 107, 0;
+        }
+
+        [data-theme="matrix"] {
+            --color-primary: #00ff00; /* Matrix Green */
+            --color-secondary: #000000; /* Black */
+            --color-shadow: 0, 255, 0;
+            --bg-color: #000000;
         }
 
         /* Set the main font for the digital/terminal feel */
@@ -55,10 +75,12 @@
         /* Glitch Flicker (for typing/transition) */
         @keyframes glitch-flicker {
             0% { transform: translate(0); opacity: 0.9; }
-            50% { transform: translate(1px, -1px); color: var(--color-secondary); opacity: 0.5; }
+            25% { transform: translate(1px, -1px); color: var(--color-secondary); opacity: 0.6; }
+            50% { transform: translate(-1px, 1px); color: var(--color-primary); opacity: 0.8; }
+            75% { transform: translate(1px, 0); opacity: 0.6; }
             100% { transform: translate(-1px, 1px); color: var(--color-primary); opacity: 1; }
         }
-        .text-glitch { animation: glitch-flicker 0.2s steps(2, start) infinite; }
+        .text-glitch { animation: glitch-flicker 0.3s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
 
         /* Background Circuit Grid (Subtle, complex background) */
         .circuit-bg {
@@ -177,7 +199,7 @@
             position: fixed;
             z-index: 50; /* Above regular content but below header (z-50) */
             opacity: 0.3; /* Start visible */
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), left 0.6s cubic-bezier(0.4, 0, 0.2, 1), top 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none; /* Crucial: Allows clicking through to content */
         }
 
@@ -200,11 +222,11 @@
 
         @keyframes blink {
             0%, 90%, 100% { opacity: 1; }
-            95% { opacity: 0; }
+            95% { opacity: 0.2; }
         }
 
         .blink {
-            animation: blink 0.1s;
+            animation: blink 0.15s ease-in-out;
         }
 
         .eye-scanned {
@@ -217,6 +239,7 @@
             0% {
                 transform: translate(0);
                 text-shadow: 0.5px 0 0 var(--color-secondary), -0.5px 0 0 var(--color-primary);
+                filter: brightness(1.2);
             }
             14% { transform: translate(-2px, 1px); }
             15% { transform: translate(4px, -3px); }
@@ -226,7 +249,8 @@
             20% { transform: translate(1px, 2px); }
             22% {
                 transform: translate(0);
-                text-shadow: 0 0 0 var(--color-secondary), 0 0 0 var(--color-primary);
+                text-shadow: 0 0 8px var(--color-primary);
+                filter: brightness(1);
             }
             100% { transform: translate(0); }
         }
@@ -241,8 +265,8 @@
         /* The scanning effect class (brief highlight, not permanent) */
         .scanned {
             /* Don't permanently force color; use a short highlight and subtle glow */
-            animation: text-glitch-scan 0.35s steps(1) 1 forwards;
-            text-shadow: 0 0 6px var(--color-primary);
+            animation: text-glitch-scan 0.4s cubic-bezier(0.4, 0, 0.2, 1) 1 forwards;
+            text-shadow: 0 0 8px var(--color-primary);
         }
 
         /* Additional glitch visual classes */
@@ -255,21 +279,23 @@
 
         @keyframes flicker {
             0% { opacity: 1 }
-            50% { opacity: 0.2 }
+            25% { opacity: 0.3 }
+            50% { opacity: 1 }
+            75% { opacity: 0.4 }
             100% { opacity: 1 }
         }
         .glitch-flicker {
-            animation: flicker 0.12s steps(1) infinite;
+            animation: flicker 0.15s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
         .glitch-blur {
             filter: blur(3px) contrast(0.9);
-            transition: filter 0.3s ease;
+            transition: filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glitch-invert {
             filter: invert(1) hue-rotate(180deg) saturate(1.2);
-            transition: filter 0.25s ease;
+            transition: filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glitch-shake {
@@ -297,17 +323,41 @@
             z-index: 49;
         }
 
+        /* Code Bleed Effect - System Corruption Visualization */
+        @keyframes code-bleed-in {
+            0% { opacity: 0; transform: translateY(-10px); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .code-bleed {
+            position: fixed;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            color: var(--color-primary);
+            text-shadow: 0 0 5px var(--color-primary);
+            white-space: nowrap;
+            opacity: 0;
+            z-index: 1000;
+            pointer-events: none;
+            animation: code-bleed-in 8s ease-out forwards;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
 
         /* Styling for the Particles and Echoes created by the teleport function */
         .particle {
             position: fixed;
-            width: 4px;
-            height: 4px;
-            background-color: var(--color-secondary); /* Magenta for teleportation energy */
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, var(--color-secondary), transparent);
             border-radius: 50%;
             pointer-events: none;
-            animation: particle-fade 2s ease-out forwards;
+            animation: particle-fade 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
             z-index: 9999;
+            box-shadow: 0 0 10px var(--color-secondary);
         }
 
         .echo-eye {
@@ -317,18 +367,37 @@
             border: 2px solid var(--color-primary);
             border-radius: 50%;
             pointer-events: none;
-            animation: echo-ring 1s ease-out forwards;
+            animation: echo-ring 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             z-index: 9999;
             opacity: 0.8;
+            box-shadow: 0 0 15px var(--color-primary);
         }
 
         @keyframes particle-fade {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0); opacity: 0; }
+            0% { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% { 
+                transform: scale(0) translateY(-30px); 
+                opacity: 0; 
+            }
         }
+
         @keyframes echo-ring {
-            0% { transform: scale(0.1); opacity: 0.8; }
-            100% { transform: scale(2); opacity: 0; }
+            0% { 
+                transform: scale(0.1); 
+                opacity: 0.8;
+                box-shadow: 0 0 5px var(--color-primary);
+            }
+            100% { 
+                transform: scale(3); 
+                opacity: 0;
+                box-shadow: 0 0 25px var(--color-primary);
+            }
         }
 
         /* New: Cursor Flicker */
@@ -488,17 +557,6 @@
 
     <div id="code-stream-bg"></div>
 
-    <div id="observer-eye-container" class="hidden lg:block">
-        <div id="observer-eye" class="w-48 h-48 relative system-glow">
-            <div id="laser-beam"></div>
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-                <circle cx="50" cy="50" r="48" fill="#151515" stroke="var(--color-primary)" stroke-width="1.5" opacity="0.8"/>
-                <circle id="iris" cx="50" cy="50" r="25" fill="var(--color-primary)" opacity="0.2"/>
-                <circle id="pupil" cx="50" cy="50" r="10" fill="#000" stroke="var(--color-primary)" stroke-width="2"/>
-            </svg>
-            <p class="absolute right-0 bottom-5 text-sm font-display text-primary uppercase">[ Monitoring ]</p>
-        </div>
-    </div>
 
     <header class="header sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800 transition-all duration-300">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -514,6 +572,7 @@
                 <li><a href="#contact" class="nav-link hover:text-primary transition-colors-all">05: /CommLink</a></li>
             </ul>
 
+            <button id="theme-switcher" class="hidden md:block px-3 py-2 bg-secondary text-white font-bold rounded-full hover:bg-pink-300 transition-colors-all system-glow mr-2">THEME</button>
             <a href="#contact" class="hidden md:block px-5 py-2 bg-primary text-gray-900 font-bold rounded-full hover:bg-cyan-300 transition-colors-all system-glow">INITIATE_COMM</a>
 
             <button id="menu-toggle" class="md:hidden text-2xl hover:text-primary focus:outline-none">
@@ -693,7 +752,7 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     <a href="https://adminpaneldash.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
-                        <div class="w-full h-48 bg-cover bg-center border-b border-primary/50" style="background-image: url('admin panel dashboard.png');"></div>
+                        <img src="admin panel dashboard.png" alt="Admin Panel Dashboard" class="w-full h-48 object-cover border-b border-primary/50" loading="lazy">
                         <div class="p-6">
                             <h3 class="text-xl font-display font-bold mb-2 text-primary scanned-target">ADMIN PANEL DASHBOARD</h3>
                             <p class="text-gray-400 text-sm">Log ID: 7A-44B | <span class="text-secondary">STATUS: DEPLOYED</span></p>
@@ -701,7 +760,7 @@
                         </div>
                     </a>
                     <a href="https://wagerwager.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
-                        <div class="w-full h-48 bg-cover bg-center border-b border-primary/50" style="background-image: url('wagerwager.png');"></div>
+                        <img src="wagerwager.png" alt="WagerWager" class="w-full h-48 object-cover border-b border-primary/50" loading="lazy">
                         <div class="p-6">
                             <h3 class="text-xl font-display font-bold mb-2 text-primary scanned-target">WAGERWAGER</h3>
                             <p class="text-gray-400 text-sm">Log ID: 9C-92F | <span class="text-secondary">STATUS: INTERACTIVE</span></p>
@@ -709,7 +768,7 @@
                         </div>
                     </a>
                     <a href="https://studentdashsam.netlify.app" target="_blank" class="block group animate-fade-in data-card rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.03]">
-                        <div class="w-full h-48 bg-cover bg-center border-b border-primary/50" style="background-image: url('student dashboard.png');"></div>
+                        <img src="student dashboard.png" alt="Student Dashboard" class="w-full h-48 object-cover border-b border-primary/50" loading="lazy">
                         <div class="p-6">
                             <h3 class="text-xl font-display font-bold mb-2 text-primary">STUDENT DASHBOARD</h3>
                             <p class="text-gray-400 text-sm">Log ID: 2B-11A | <span class="text-secondary">STATUS: MONITORING</span></p>
@@ -771,10 +830,13 @@
         </section>
     </main>
 
-    <footer class="bg-gray-900 border-t border-gray-800">
+    <footer class="bg-gray-900 border-t border-gray-800 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-500 font-primary">
             <p>// LOG_END: © 2024 Samuel. CORE_SYSTEM_ONLINE.</p>
         </div>
+        <button id="feedback-btn" class="fixed bottom-4 right-4 bg-primary text-gray-900 px-3 py-2 rounded-full font-bold text-sm hover:bg-cyan-300 transition-colors system-glow z-40">
+            FEEDBACK
+        </button>
     </footer>
 
         </main>

@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const observerEye = document.getElementById('observer-eye');
     const pupil = document.getElementById('pupil');
     const iris = document.getElementById('iris');
-    const laserBeam = document.getElementById('laser-beam');
     const scanTargets = document.querySelectorAll('.scanned-target');
     const heroSubtitle = document.getElementById('hero-subtitle');
 
@@ -87,11 +86,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // Check whether an element is visible in the viewport
+        // Check whether an element is significantly visible in the viewport (at least 25% visible)
         const isElementInViewport = (el) => {
             if (!el || !el.getBoundingClientRect) return false;
             const r = el.getBoundingClientRect();
-            return (r.bottom >= 0 && r.right >= 0 && r.top <= (window.innerHeight || document.documentElement.clientHeight) && r.left <= (window.innerWidth || document.documentElement.clientWidth));
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+            
+            // Element must be at least partially in viewport
+            const isPartiallyInViewport = r.bottom > 0 && r.right > 0 && r.top < viewportHeight && r.left < viewportWidth;
+            if (!isPartiallyInViewport) return false;
+            
+            // Calculate visibility percentage - must be at least 25% visible
+            const visibleHeight = Math.min(r.bottom, viewportHeight) - Math.max(r.top, 0);
+            const visibleWidth = Math.min(r.right, viewportWidth) - Math.max(r.left, 0);
+            const elementArea = r.width * r.height;
+            const visibleArea = Math.max(0, visibleHeight) * Math.max(0, visibleWidth);
+            const visibilityPercent = elementArea > 0 ? (visibleArea / elementArea) * 100 : 0;
+            
+            return visibilityPercent >= 25;
         };
 
         // Helper: scramble text letters
@@ -132,10 +145,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 snippet.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
                 snippet.style.left = Math.random() * 100 + '%';
                 snippet.style.top = (Math.random() * 50 - 10) + '%';
+                snippet.style.zIndex = '1000';
+                snippet.style.pointerEvents = 'none';
                 document.body.appendChild(snippet);
                 currentError.bleedSnippets = currentError.bleedSnippets || [];
                 currentError.bleedSnippets.push(snippet);
-                setTimeout(() => { try { document.body.removeChild(snippet); } catch(e){} }, 8000);
+                const removeTimer = setTimeout(() => { try { document.body.removeChild(snippet); } catch(e){} }, 8000);
+                if (!currentError.timers) currentError.timers = [];
+                currentError.timers.push(removeTimer);
             }
         };
 
@@ -174,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const oldY = rect.top + rect.height / 2;
 
             observerEyeContainer.style.opacity = '0';
+            observerEyeContainer.style.transition = 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
 
             setTimeout(() => {
                 createParticles(oldX, oldY);
@@ -198,10 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 observerEyeContainer.style.left = `${randomX}px`;
                 observerEyeContainer.style.top = `${randomY}px`;
-
+                observerEyeContainer.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
                 observerEyeContainer.style.opacity = String(options.fadeTo);
                 isEyeFading = false;
-            }, 500);
+            }, 300);
         };
 
         // Pupil/laser focus and short scan animation
@@ -413,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const eyeTargetX = Math.max(0, targetCenterX - eyeSize * 2.5);
             const eyeTargetY = Math.max(0, targetCenterY - eyeSize / 2);
 
-            observerEyeContainer.style.transition = 'left 0.8s ease-in-out, top 0.8s ease-in-out, opacity 0.5s';
+            observerEyeContainer.style.transition = 'left 0.7s cubic-bezier(0.4, 0, 0.2, 1), top 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out';
             observerEyeContainer.style.left = `${eyeTargetX}px`;
             observerEyeContainer.style.top = `${eyeTargetY}px`;
 
@@ -497,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isEyeFading = false;
             isObservingUser = true;
 
-            observerEyeContainer.style.transition = 'left 0.4s ease-out, top 0.4s ease-out, opacity 0.3s';
+            observerEyeContainer.style.transition = 'left 0.35s cubic-bezier(0.4, 0, 0.2, 1), top 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-in-out';
 
             const eyeX = Math.max(10, Math.min(window.innerWidth - observerEye.offsetWidth - 10, lastMouseX - observerEye.offsetWidth / 2));
             const eyeY = Math.max(10, Math.min(window.innerHeight - observerEye.offsetHeight - 10, lastMouseY - observerEye.offsetHeight / 2));
@@ -515,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearTimeout(errorSchedulerTimer);
                 errorSchedulerTimer = null;
             }
-            const next = Math.random() * 3000 + 2000; // 2-5 seconds (reduced)
+            const next = Math.random() * 7000 + 8000; // 8-15 seconds
             console.log('Scheduling next error in', Math.round(next), 'ms');
             errorSchedulerTimer = setTimeout(() => {
                 errorSchedulerTimer = null;
@@ -527,12 +545,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // MOUSE TRACKING UPDATE
         // =========================================================================
 
+        // Throttle mousemove for better performance
+        let lastMouseMove = 0;
+        const MOUSEMOVE_THROTTLE = 16; // ~60fps
         window.addEventListener('mousemove', (e) => {
             lastMouseX = e.clientX;
             lastMouseY = e.clientY;
+            const now = performance.now();
+            if (now - lastMouseMove < MOUSEMOVE_THROTTLE) return;
+            lastMouseMove = now;
 
             // Only track if the eye is visible and NOT fixing an error
-            if (observerEyeContainer.style.opacity > 0.1 && !isErrorActive && !isEyeFading) {
+            if (observerEyeContainer && observerEyeContainer.style.opacity > 0.1 && !isErrorActive && !isEyeFading) {
                 const eyeRect = observerEye.getBoundingClientRect();
                 const eyeCenterX = eyeRect.left + eyeRect.width / 2;
                 const eyeCenterY = eyeRect.top + eyeRect.height / 2;
@@ -583,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // =========================================================================
 
         // Trigger an initial error shortly after load (for demonstration)
-        setTimeout(triggerError, 500);
+        const initialErrorTimer = setTimeout(triggerError, 500);
 
         // Start the randomized scheduler
         scheduleNextError();
@@ -592,5 +616,15 @@ document.addEventListener('DOMContentLoaded', () => {
         observerEyeContainer.style.left = '-100px';
         observerEyeContainer.style.top = '-100px';
         observerEyeContainer.style.opacity = '0';
+
+        // Cleanup on page unload to prevent memory leaks
+        window.addEventListener('beforeunload', () => {
+            if (initialErrorTimer) clearTimeout(initialErrorTimer);
+            if (errorSchedulerTimer) clearTimeout(errorSchedulerTimer);
+            if (errorFixTimer) clearTimeout(errorFixTimer);
+            if (userWatchTimer) clearTimeout(userWatchTimer);
+            if (laserTimer) clearTimeout(laserTimer);
+            if (currentError.timers) currentError.timers.forEach(t => clearTimeout(t));
+        });
     }
 });

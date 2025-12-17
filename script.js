@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // NEW ELEMENTS
     const primarySpan = heroTitleElement ? heroTitleElement.querySelector('.text-primary') : null;
     const codeStreamBg = document.getElementById('code-stream-bg');
+    const themeSwitcher = document.getElementById('theme-switcher');
+    const feedbackBtn = document.getElementById('feedback-btn');
     
     // Hero Text Data (Keep existing)
     const primaryTitleText = 'Samuel';
@@ -287,7 +289,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Three.js Observer Shell Preloader
+    // Theme Switcher
+    const themes = ['default', 'neon', 'retro', 'matrix'];
+    let currentThemeIndex = 0;
+
+    if (themeSwitcher) {
+        themeSwitcher.addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const newTheme = themes[currentThemeIndex];
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeSwitcher.textContent = newTheme.toUpperCase();
+
+            // Update Three.js eye color to match theme
+            if (material) {
+                if (newTheme === 'neon') material.color.setHex(0x00ff00);
+                else if (newTheme === 'retro') material.color.setHex(0xff6b00);
+                else if (newTheme === 'matrix') material.color.setHex(0x00ff00);
+                else material.color.setHex(0x00ffff); // default cyan
+            }
+        });
+    }
+
+    // Feedback Mechanism
+    if (feedbackBtn) {
+        feedbackBtn.addEventListener('click', () => {
+            const feedback = prompt('Share your feedback about the site:');
+            if (feedback) {
+                console.log('User feedback:', feedback);
+                alert('Thank you for your feedback! It has been logged.');
+            }
+        });
+    }
+
+    // Three.js Particle Eye (Converted from SVG)
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -296,11 +330,15 @@ document.addEventListener('DOMContentLoaded', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    // 1. The Anatomical Particle Eye
-    const particleCount = 12000;
+    // The Anatomical Particle Eye/Face
+    const particleCount = 20000;
     const geometry = new THREE.BufferGeometry();
     const pos = new Float32Array(particleCount * 3);
     const targets = new Float32Array(particleCount * 3);
+
+    // Create face targets: sinister smile face
+    const faceTargets = new Float32Array(particleCount * 3);
+    const eyeTargets = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount; i++) {
         // Chaos Start
@@ -308,20 +346,73 @@ document.addEventListener('DOMContentLoaded', () => {
         pos[i*3+1] = (Math.random()-0.5)*50;
         pos[i*3+2] = (Math.random()-0.5)*50;
 
-        // Eye Target Math (Sphere + Iris Dent)
+        // --- SINISTER FACE TARGETS ---
+        const progress = i / particleCount;
+        let x, y, z = 0;
+
+        if (progress < 0.4) {
+            // STATE 1: THE FACE MASK (40% of particles)
+            // Creates a faint, large oval to act as the "skin"
+            const angle = Math.random() * Math.PI * 2;
+            const radiusX = 4 + (Math.random() * 0.2); // Slight jitter
+            const radiusY = 5 + (Math.random() * 0.2);
+            x = Math.cos(angle) * radiusX;
+            y = Math.sin(angle) * radiusY;
+            z = -1; // Push it slightly back
+        }
+        else if (progress < 0.5) {
+            // STATE 2: LEFT EYE (10% - Filled)
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * 0.4; // Random radius fills the circle
+            x = -1.5 + Math.cos(angle) * r;
+            y = 1.5 + Math.sin(angle) * r;
+            z = 0.5;
+        }
+        else if (progress < 0.6) {
+            // STATE 3: RIGHT EYE (10% - Filled)
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * 0.4;
+            x = 1.5 + Math.cos(angle) * r;
+            y = 1.5 + Math.sin(angle) * r;
+            z = 0.5;
+        }
+        else if (progress < 0.65) {
+            // STATE 4: THE NOSE (5% - Sharp Triangle)
+            x = (Math.random() - 0.5) * 0.5;
+            y = 0.5 - (Math.random() * 1.0);
+            z = 0.8;
+        }
+        else {
+            // STATE 5: THE SINISTER MOUTH (35% - Wide & Sharp)
+            // Using a parabolic curve for a sharper, wider grin
+            const t = (progress - 0.65) / 0.35; // 0 to 1
+            const mouthWidth = 6;
+            x = (t - 0.5) * mouthWidth;
+            // The "Sinister" curve: y = x^2 - constant
+            y = -1.5 + (Math.pow(x, 2) * 0.15);
+
+            // Add vertical "teeth" jitter to make it look glitchy/scary
+            y += (Math.random() - 0.5) * 0.3;
+            z = 0.2;
+        }
+
+        faceTargets[i*3] = x;
+        faceTargets[i*3+1] = y;
+        faceTargets[i*3+2] = z;
+
+        // Eye Target (original sphere with dent)
         const phi = Math.acos(-1 + (2 * i) / particleCount);
         const theta = Math.sqrt(particleCount * Math.PI) * phi;
-        let x = 3 * Math.cos(theta) * Math.sin(phi);
-        let y = 3 * Math.sin(theta) * Math.sin(phi);
-        let z = 3 * Math.cos(phi);
+        let ex = 3 * Math.cos(theta) * Math.sin(phi);
+        let ey = 3 * Math.sin(theta) * Math.sin(phi);
+        let ez = 3 * Math.cos(phi);
 
-        // Create the "Iris Dent" on the front (z > 2)
-        const distToFront = Math.sqrt(x*x + y*y + (z-3)*(z-3));
-        if(distToFront < 1.8) { z -= 0.6; } // Carve the pupil hole
+        const distToFront = Math.sqrt(ex*ex + ey*ey + (ez-3)*(ez-3));
+        if(distToFront < 1.8) { ez -= 0.6; }
 
-        targets[i*3] = x;
-        targets[i*3+1] = y;
-        targets[i*3+2] = z;
+        eyeTargets[i*3] = ex;
+        eyeTargets[i*3+1] = ey;
+        eyeTargets[i*3+2] = ez;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -331,6 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     camera.position.z = 10;
 
+    // Dynamic Lighting (follows the eye)
+    const eyeLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    eyeLight.position.set(5, 3, 5);
+    scene.add(eyeLight);
+    scene.add(new THREE.AmbientLight(0x222222));
+
     // Handle window resize
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -338,13 +435,351 @@ document.addEventListener('DOMContentLoaded', () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // 3. The "Awakening" & Drift
+    // Glitch Detection & Fixing (adapted from eye.js)
+    let isErrorActive = false;
+    let isEyeFading = false;
+    let errorFixTimer = null;
+    let errorSchedulerTimer = null;
+
+    const allowedSelectors = [
+        '.scanned-target',
+        '.hero-title',
+        '.hero-subtitle',
+        '.hero-description',
+        '.cta-btn',
+        'nav a',
+        '.section-title',
+        '.data-card-header',
+        '#hero-main-title .text-primary',
+        'h1', 'h2', 'h3', 'h4', 'p', 'button', 'a'
+    ];
+
+    const lastTargetTime = new WeakMap();
+    const TARGET_COOLDOWN_MS = 3000;
+
+    const errorTypes = [
+        'COLOR_MISMATCH',
+        'TEXT_CORRUPTION',
+        'WORD_SWAP',
+        'SPACER_MISSING',
+        'SCRAMBLE',
+        'GLITCH_FLICKER',
+        'BLUR',
+        'INVERT',
+        'SHAKE',
+        'CRITICAL'
+    ];
+
+    let currentError = {
+        element: null,
+        type: null,
+        originalContent: null,
+        originalClass: null,
+        originalStyle: null,
+        appliedEffects: []
+    };
+
+    let lastErrorType = null;
+
+    function isElementInViewport(el) {
+        if (!el || !el.getBoundingClientRect) return false;
+        const r = el.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+
+        // Element must be fully within viewport bounds
+        return r.top >= 0 && r.left >= 0 && r.bottom <= viewportHeight && r.right <= viewportWidth;
+    }
+
+    function scrambleText(text) {
+        if (!text) return text;
+        const arr = text.split('');
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr.join('');
+    }
+
+    function randomGlitchString() {
+        const samples = ['[DATA_ERR]', '[SYS:404]', '█▇▆▅', '??!?', '[MONITORING]', '[CORE_FAIL]'];
+        return samples[Math.floor(Math.random() * samples.length)];
+    }
+
+    function chooseWeightedTarget(candidates) {
+        if (!candidates || candidates.length === 0) return null;
+        if (Math.random() < 0.2) return candidates[Math.floor(Math.random() * candidates.length)];
+
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const biasFactor = 0.005;
+        const weights = candidates.map((el) => {
+            const r = el.getBoundingClientRect();
+            const ex = r.left + r.width / 2;
+            const ey = r.top + r.height / 2;
+            const d = Math.hypot(ex - cx, ey - cy);
+            return 1 / (1 + d * biasFactor);
+        });
+        const sum = weights.reduce((s, w) => s + w, 0);
+        let rnd = Math.random() * sum;
+        for (let i = 0; i < candidates.length; i++) {
+            rnd -= weights[i];
+            if (rnd <= 0) return candidates[i];
+        }
+        return candidates[candidates.length - 1];
+    }
+
+    function triggerError() {
+        if (isErrorActive) {
+            scheduleNextError();
+            return;
+        }
+
+        const nodes = new Set();
+        allowedSelectors.forEach(sel => {
+            try {
+                document.querySelectorAll(sel).forEach(n => nodes.add(n));
+            } catch (e) {}
+        });
+
+        const candidates = Array.from(nodes).filter(el => el !== eyeMesh && isElementInViewport(el));
+        const now = Date.now();
+        const freshCandidates = candidates.filter(el => (now - (lastTargetTime.get(el) || 0)) > TARGET_COOLDOWN_MS);
+        const visibleCandidates = freshCandidates.length ? freshCandidates : candidates;
+
+        if (visibleCandidates.length === 0) {
+            scheduleNextError();
+            return;
+        }
+
+        isErrorActive = true;
+        const target = chooseWeightedTarget(visibleCandidates);
+        if (!target) {
+            scheduleNextError();
+            return;
+        }
+
+        lastTargetTime.set(target, Date.now());
+
+        // Select error type different from last one
+        let errorType;
+        let attempts = 0;
+        do {
+            errorType = errorTypes[Math.floor(Math.random() * errorTypes.length)];
+            attempts++;
+        } while (errorType === lastErrorType && attempts < 10); // Prevent infinite loop
+
+        lastErrorType = errorType;
+
+        // Ensure target has content for text-based errors
+        if ((errorType === 'TEXT_CORRUPTION' || errorType === 'SCRAMBLE') && !target.textContent.trim()) {
+            scheduleNextError(); // Skip if no text
+            return;
+        }
+
+        console.log('Triggering error on:', target.tagName, target.className, 'Type:', errorType);
+
+        currentError.element = target;
+        currentError.type = errorType;
+        currentError.originalClass = target.className;
+        currentError.originalContent = target.innerHTML;
+        currentError.originalStyle = target.style.cssText;
+        currentError.appliedEffects = [];
+
+        // Inject error
+        switch (errorType) {
+            case 'COLOR_MISMATCH':
+                target.classList.add('corrupted-pink');
+                currentError.appliedEffects.push('corrupted-pink');
+                gsap.fromTo(target, { opacity: 1 }, { opacity: 0.3, duration: 0.1, yoyo: true, repeat: 3 });
+                break;
+            case 'TEXT_CORRUPTION':
+                currentError.originalContent = target.innerHTML;
+                target.textContent = randomGlitchString();
+                target.classList.add('corrupted-pink');
+                currentError.appliedEffects.push('corrupted-pink');
+                gsap.fromTo(target, { scale: 1 }, { scale: 1.1, duration: 0.2, yoyo: true, repeat: 2 });
+                break;
+            case 'SCRAMBLE':
+                currentError.originalContent = target.innerHTML;
+                target.textContent = scrambleText(target.textContent);
+                target.classList.add('glitch-shake');
+                currentError.appliedEffects.push('glitch-shake');
+                gsap.fromTo(target, { rotation: 0 }, { rotation: 5, duration: 0.1, yoyo: true, repeat: 5 });
+                break;
+            case 'GLITCH_FLICKER':
+                target.classList.add('glitch-flicker');
+                currentError.appliedEffects.push('glitch-flicker');
+                gsap.fromTo(target, { opacity: 1 }, { opacity: 0.5, duration: 0.05, yoyo: true, repeat: 10 });
+                break;
+            case 'WORD_SWAP':
+                // Find another visible element to swap text with
+                const otherCandidates = visibleCandidates.filter(el => el !== target && el.textContent.trim());
+                if (otherCandidates.length) {
+                    const other = otherCandidates[Math.floor(Math.random() * otherCandidates.length)];
+                    currentError.otherElement = other;
+                    currentError.otherOriginal = other.innerHTML;
+                    const tmp = other.innerHTML;
+                    other.innerHTML = target.innerHTML;
+                    target.innerHTML = tmp;
+                    target.classList.add('corrupted-pink');
+                    other.classList.add('corrupted-pink');
+                    currentError.appliedEffects.push('word-swap');
+                    gsap.fromTo([target, other], { scale: 1 }, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 2 });
+                }
+                break;
+            case 'SPACER_MISSING':
+                currentError.originalStyle = target.style.display;
+                target.style.display = 'none';
+                currentError.appliedEffects.push('spacer-missing');
+                // No animation needed for hidden element
+                break;
+            case 'BLUR':
+                target.style.filter = 'blur(3px)';
+                currentError.appliedEffects.push('blur');
+                gsap.fromTo(target, { opacity: 1 }, { opacity: 0.7, duration: 0.3, yoyo: true, repeat: 2 });
+                break;
+            case 'INVERT':
+                target.style.filter = 'invert(1) hue-rotate(180deg)';
+                currentError.appliedEffects.push('invert');
+                gsap.fromTo(target, { scale: 1 }, { scale: 0.95, duration: 0.2, yoyo: true, repeat: 3 });
+                break;
+            case 'SHAKE':
+                target.classList.add('glitch-shake');
+                currentError.appliedEffects.push('glitch-shake');
+                gsap.fromTo(target, { x: 0 }, { x: 5, duration: 0.1, yoyo: true, repeat: 10, ease: "power2.inOut" });
+                break;
+            case 'CRITICAL':
+                // Combine multiple effects
+                target.classList.add('corrupted-pink', 'glitch-flicker', 'glitch-shake');
+                currentError.appliedEffects.push('corrupted-pink', 'glitch-flicker', 'glitch-shake');
+                target.style.filter = 'blur(2px) invert(0.5)';
+                currentError.appliedEffects.push('critical-blur-invert');
+                gsap.fromTo(target, { rotation: 0, scale: 1 }, { rotation: 10, scale: 1.1, duration: 0.3, yoyo: true, repeat: 3 });
+                break;
+        }
+
+        // Morph to eye shape and teleport near target
+        gsap.to(geometry.attributes.position.array, {
+            endArray: eyeTargets,
+            duration: 0.5,
+            ease: "power2.inOut",
+            onUpdate: () => { geometry.attributes.position.needsUpdate = true; }
+        });
+
+        const rect = target.getBoundingClientRect();
+        gsap.to(eyeMesh.position, {
+            x: (rect.left + rect.width / 2 - window.innerWidth / 2) * 0.02,
+            y: -(rect.top + rect.height / 2 - window.innerHeight / 2) * 0.02,
+            z: 2, // Bring to foreground
+            duration: 0.8,
+            ease: "power2.inOut"
+        });
+        gsap.to(eyeMesh.scale, { x: 1, y: 1, z: 1, duration: 0.8 }, "-=0.8"); // Scale up for visibility
+
+        setTimeout(() => {
+            fixError();
+        }, Math.random() * 2000 + 2000); // Increased to 2-4 seconds
+    }
+
+    function fixError() {
+        if (!isErrorActive || !currentError.element) return;
+
+        console.log('Fixing error on:', currentError.element.tagName, currentError.type);
+
+        const target = currentError.element;
+
+        // Restore content
+        if (currentError.type === 'TEXT_CORRUPTION' || currentError.type === 'SCRAMBLE') {
+            if (typeof currentError.originalContent === 'string') {
+                target.innerHTML = currentError.originalContent;
+            }
+        } else if (currentError.type === 'WORD_SWAP') {
+            // Swap back
+            if (currentError.otherElement && typeof currentError.otherOriginal === 'string') {
+                currentError.otherElement.innerHTML = currentError.otherOriginal;
+            }
+            if (typeof currentError.originalContent === 'string') {
+                target.innerHTML = currentError.originalContent;
+            }
+        } else if (currentError.type === 'SPACER_MISSING') {
+            target.style.display = currentError.originalStyle || '';
+        } else if (currentError.type === 'BLUR') {
+            target.style.filter = target.style.filter.replace('blur(3px)', '').trim();
+        } else if (currentError.type === 'INVERT') {
+            target.style.filter = target.style.filter.replace('invert(1) hue-rotate(180deg)', '').trim();
+        } else if (currentError.type === 'CRITICAL') {
+            target.style.filter = target.style.filter.replace('blur(2px) invert(0.5)', '').trim();
+        }
+
+        // Remove corruption
+        currentError.appliedEffects.forEach(c => {
+            try { target.classList.remove(c); } catch(e){}
+        });
+        target.classList.add('scanned');
+
+        // Change color to green for fixing
+        gsap.to(material.color, { r: 0, g: 1, b: 0, duration: 0.2 });
+        // Pulse eye for "scan"
+        gsap.to(material, { size: 0.06, duration: 0.5, yoyo: true, repeat: 1 });
+
+        setTimeout(() => {
+            target.classList.remove('scanned');
+            if (typeof currentError.originalClass === 'string') {
+                target.className = currentError.originalClass.trim();
+            }
+            // Change eye color back to cyan
+            gsap.to(material.color, { r: 0, g: 1, b: 0.95, duration: 0.5 });
+            enterObserveMode();
+        }, 1500); // Increased to 1.5 seconds
+    }
+
+    function enterObserveMode() {
+        isErrorActive = false;
+        isEyeFading = false;
+
+        // Morph back to face and return to corner
+        gsap.to(geometry.attributes.position.array, {
+            endArray: faceTargets,
+            duration: 0.5,
+            ease: "power2.inOut",
+            onUpdate: () => { geometry.attributes.position.needsUpdate = true; }
+        });
+
+        gsap.to(eyeMesh.position, {
+            x: 6, y: 3, z: -5,
+            duration: 1,
+            ease: "power2.inOut"
+        });
+        gsap.to(eyeMesh.scale, { x: 0.5, y: 0.5, z: 0.5, duration: 1 }, "-=1"); // Scale back down
+
+        scheduleNextError();
+    }
+
+    function scheduleNextError() {
+        if (errorSchedulerTimer) clearTimeout(errorSchedulerTimer);
+        const next = Math.random() * 5000 + 5000; // 5-10 seconds
+        console.log('Scheduling next error in', next, 'ms');
+        errorSchedulerTimer = setTimeout(() => {
+            console.log('Triggering scheduled error');
+            triggerError();
+        }, next);
+    }
+
+    // Mouse tracking for iris/pupil movement
+    let mouse = { x: 0, y: 0 };
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    // Assembly & Drift
     let isLoaded = false;
 
     function awakeGuardian() {
         const tl = gsap.timeline();
 
-        // Assemble the eye
+        // Assemble into face
         let assemblyProgress = 0;
         tl.to({progress: 1}, {
             progress: 1,
@@ -354,9 +789,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 assemblyProgress = tl.progress();
                 const currentArray = geometry.attributes.position.array;
 
-                // Interpolate positions
+                // Interpolate to face positions
                 for (let i = 0; i < particleCount * 3; i++) {
-                    currentArray[i] = pos[i] + (targets[i] - pos[i]) * assemblyProgress;
+                    currentArray[i] = pos[i] + (faceTargets[i] - pos[i]) * assemblyProgress;
                 }
 
                 geometry.attributes.position.needsUpdate = true;
@@ -370,12 +805,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ease: "power2.inOut"
         })
         .to(eyeMesh.scale, { x: 0.5, y: 0.5, z: 0.5, duration: 2 }, "-=2")
+        .to(material, { opacity: 0.3, duration: 0.5 }) // Set to 0.3 like SVG
         .to('#main-content', { opacity: 1, duration: 1 }, "-=1");
 
         isLoaded = true;
+
+        // Start glitch detection immediately
+        scheduleNextError();
     }
 
-    // 4. The Bug Patching Reaction
+    // Bug patching reaction
     function patchBugReaction() {
         gsap.to(material.color, { r: 1, g: 0, b: 0, duration: 0.1 }); // Turn Red
         gsap.to(eyeMesh.scale, { x: 0.7, y: 0.7, z: 0.7, yoyo: true, repeat: 1, duration: 0.2 }); // Pulse
@@ -384,20 +823,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // 5. Interactive Eye Rotation
-    let mouse = { x: 0, y: 0 };
-    window.addEventListener('mousemove', (e) => {
-        mouse.x = (e.clientX / window.innerWidth) - 0.5;
-        mouse.y = (e.clientY / window.innerHeight) - 0.5;
-    });
-
     function animate() {
         requestAnimationFrame(animate);
 
-        // Look-at logic (follows mouse with a slight lag)
         if (isLoaded) {
-            eyeMesh.rotation.y += (mouse.x * 1.5 - eyeMesh.rotation.y) * 0.1;
-            eyeMesh.rotation.x += (-mouse.y * 1.5 - eyeMesh.rotation.x) * 0.1;
+            // Update dynamic lighting position relative to eye
+            eyeLight.position.x = eyeMesh.position.x + 3;
+            eyeLight.position.y = eyeMesh.position.y + 3;
+            eyeLight.position.z = eyeMesh.position.z + 3;
+            eyeLight.target.position.copy(eyeMesh.position);
+            eyeLight.target.updateMatrixWorld();
+
+            if (!isErrorActive && !isEyeFading) {
+                // Turn head to look at mouse (rotation only)
+                const mouse3D = new THREE.Vector3(mouse.x * 10, -mouse.y * 10, 0);
+                eyeMesh.lookAt(mouse3D);
+
+                // Subtle blinking
+                const time = Date.now() * 0.001;
+                if (Math.sin(time * 2) > 0.95) {
+                    material.opacity = 0.1;
+                } else {
+                    material.opacity = 0.3;
+                }
+
+                // Sinister face jitter
+                eyeMesh.position.x += (Math.random() - 0.5) * 0.01;
+                eyeMesh.position.y += (Math.random() - 0.5) * 0.01;
+            }
         }
 
         renderer.render(scene, camera);
@@ -406,7 +859,7 @@ document.addEventListener('DOMContentLoaded', () => {
     animate();
     window.addEventListener('load', awakeGuardian);
 
-    // Export the patch function (for use in other scripts)
+    // Export for other scripts
     window.patchBugReaction = patchBugReaction;
 
 });
