@@ -895,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 eyeMesh.position.x += (Math.random() - 0.5) * 0.01;
                 eyeMesh.position.y += (Math.random() - 0.5) * 0.01;
 
-                // If in Devil state, increase jitter
+                // If in Devil state, violent jitter
                 if (material.color.r > 0.8) { // Detecting Red/Sinister state
                     eyeMesh.position.x += (Math.random() - 0.5) * 0.05;
                     eyeMesh.position.y += (Math.random() - 0.5) * 0.05;
@@ -954,10 +954,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     }
 
-    // Randomly glitch every 20-40 seconds
-    setInterval(() => {
-        if (Math.random() > 0.7) triggerDevilGlitch();
-    }, 20000);
+    // Trigger devil glitch 5 seconds after page load
+    setTimeout(() => {
+        console.log('Triggering initial devil glitch...');
+        triggerDevilGlitch();
+    }, 10000);
+
+    // Randomly glitch every 20-40 seconds after the initial trigger
+    setTimeout(() => {
+        setInterval(() => {
+            if (Math.random() > 0.7) triggerDevilGlitch();
+        }, 20000);
+    }, 5000);
 
     // Export for other scripts
     window.patchBugReaction = patchBugReaction;
