@@ -336,9 +336,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const pos = new Float32Array(particleCount * 3);
     const targets = new Float32Array(particleCount * 3);
 
-    // Create face targets: sinister smile face
+    // Create expression targets
     const faceTargets = new Float32Array(particleCount * 3);
     const eyeTargets = new Float32Array(particleCount * 3);
+    const devilTargets = new Float32Array(particleCount * 3);
+    const surprisedTargets = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount; i++) {
         // Chaos Start
@@ -399,6 +401,48 @@ document.addEventListener('DOMContentLoaded', () => {
         faceTargets[i*3] = x;
         faceTargets[i*3+1] = y;
         faceTargets[i*3+2] = z;
+
+        // --- DEVIL TARGETS (Open Mouth + Angry Eyes) ---
+        if (progress < 0.2) { // Slanted Left Eye
+            const t = (progress / 0.2);
+            x = -1.5 + (t - 0.5) * 0.8;
+            y = 1.5 - (t - 0.5) * 0.4; // Slanted down towards center
+        } else if (progress < 0.4) { // Slanted Right Eye
+            const t = (progress - 0.2) / 0.2;
+            x = 1.5 + (t - 0.5) * 0.8;
+            y = 1.5 + (t - 0.5) * 0.4; // Slanted down towards center
+        } else if (progress < 0.8) { // Wide Open Mouth (The Void)
+            const t = (progress - 0.4) / 0.4;
+            const width = 4;
+            x = (t - 0.5) * width;
+            // Upper and lower lips created by splitting the t-range
+            if (t < 0.5) { // Upper lip
+                y = -0.5 + Math.cos(t * Math.PI * 2) * 0.5;
+            } else { // Lower lip
+                y = -2.5 - Math.cos((t-0.5) * Math.PI * 2) * 0.8;
+            }
+        } else { // Sharp Horns/Face structure
+            const angle = Math.random() * Math.PI * 2;
+            x = Math.cos(angle) * 4.5;
+            y = Math.sin(angle) * 5.5;
+        }
+        devilTargets[i*3] = x; devilTargets[i*3+1] = y; devilTargets[i*3+2] = z;
+
+        // Surprised targets (simple wide eyes, open mouth)
+        if (progress < 0.3) { // Wide Left Eye
+            const angle = Math.random() * Math.PI * 2;
+            x = -1.5 + Math.cos(angle) * 0.5;
+            y = 1.5 + Math.sin(angle) * 0.5;
+        } else if (progress < 0.6) { // Wide Right Eye
+            const angle = Math.random() * Math.PI * 2;
+            x = 1.5 + Math.cos(angle) * 0.5;
+            y = 1.5 + Math.sin(angle) * 0.5;
+        } else { // Open Mouth
+            const t = (progress - 0.6) / 0.4;
+            x = (t - 0.5) * 3;
+            y = -1 + Math.sin(t * Math.PI) * 0.8;
+        }
+        surprisedTargets[i*3] = x; surprisedTargets[i*3+1] = y; surprisedTargets[i*3+2] = z;
 
         // Eye Target (original sphere with dent)
         const phi = Math.acos(-1 + (2 * i) / particleCount);
@@ -850,6 +894,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Sinister face jitter
                 eyeMesh.position.x += (Math.random() - 0.5) * 0.01;
                 eyeMesh.position.y += (Math.random() - 0.5) * 0.01;
+
+                // If in Devil state, increase jitter
+                if (material.color.r > 0.8) { // Detecting Red/Sinister state
+                    eyeMesh.position.x += (Math.random() - 0.5) * 0.05;
+                    eyeMesh.position.y += (Math.random() - 0.5) * 0.05;
+                }
             }
         }
 
@@ -859,7 +909,59 @@ document.addEventListener('DOMContentLoaded', () => {
     animate();
     window.addEventListener('load', awakeGuardian);
 
+    // Expression Engine
+    const expressions = {
+        happy: { color: 0x00ffff, css: '#00ffff', target: faceTargets },
+        sinister: { color: 0xff0000, css: '#ff0000', target: devilTargets },
+        surprised: { color: 0xffaa00, css: '#ffaa00', target: surprisedTargets }
+    };
+
+    function switchMood(mood) {
+        const theme = expressions[mood];
+
+        // 1. Morph Particles
+        gsap.to(geometry.attributes.position.array, {
+            endArray: theme.target,
+            duration: 1,
+            ease: "expo.out",
+            onUpdate: () => { geometry.attributes.position.needsUpdate = true; }
+        });
+
+        // 2. Change Three.js Color
+        gsap.to(material.color, {
+            r: new THREE.Color(theme.color).r,
+            g: new THREE.Color(theme.color).g,
+            b: new THREE.Color(theme.color).b,
+            duration: 1
+        });
+
+        // 3. Update CSS Variables (Site-wide theme)
+        document.documentElement.style.setProperty('--color-primary', theme.css);
+    }
+
+    // Devil Glitch
+    function triggerDevilGlitch() {
+        // Sudden snap to Devil
+        switchMood('sinister');
+        document.body.classList.add('emergency-glitch'); // Add CSS shake/flicker
+
+        console.warn("SYSTEM_HIJACK_DETECTED");
+
+        // Snap back to Happy after 800ms
+        setTimeout(() => {
+            switchMood('happy');
+            document.body.classList.remove('emergency-glitch');
+        }, 800);
+    }
+
+    // Randomly glitch every 20-40 seconds
+    setInterval(() => {
+        if (Math.random() > 0.7) triggerDevilGlitch();
+    }, 20000);
+
     // Export for other scripts
     window.patchBugReaction = patchBugReaction;
+    window.switchMood = switchMood;
+    window.triggerDevilGlitch = triggerDevilGlitch;
 
 });
